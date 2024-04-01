@@ -1,7 +1,7 @@
 {
-  "name": "venefish",
-  "description": "Boilerplate & template for Vercel projects using Next.js, Firebase and shadcn/ui.",
-  "author": "Enesien Software <contact@enesien.com> (https://enesien.com)",
+  "name": "wildernessdirector",
+  "description": "Web platform for WM Education",
+  "author": "Second Path Studio LLC",
   "version": "0.1.0",
   "private": true,
   "scripts": {
