@@ -54,7 +54,7 @@ export const MyFirebaseProvider: FC<{ children: ReactNode }> = ({
 }) => {
   return (
     <>
-      <FirebaseAppProvider firebaseConfig={config}>
+      <FirebaseAppProvider firebaseConfig={firebaseConfig}>
         <FirebaseProviderSDKs>{children}</FirebaseProviderSDKs>
       </FirebaseAppProvider>
     </>
