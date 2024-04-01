@@ -14,14 +14,14 @@ import { isBrowser } from "@/lib/utils";
 import { getAnalytics } from "firebase/analytics";
 import { FirebaseOptions } from "firebase/app";
 
-const config: FirebaseOptions = {
-  apiKey: "AIzaSyDnVqs8TBiIicdOcqb5WWqCUDB_GMywzs4",
-  authDomain: "venefish-4b609.firebaseapp.com",
-  projectId: "venefish-4b609",
-  storageBucket: "venefish-4b609.appspot.com",
-  messagingSenderId: "976336889830",
-  appId: "1:976336889830:web:030a5e0b9e6053da961827",
-  measurementId: "G-GFMBQQW6PC",
+const firebaseConfig = {
+  apiKey: "AIzaSyBNsAaANv4Fp2yuOtKK3QuwLTqc5E_zIb8",
+  authDomain: "wildernessdirector-755c1.firebaseapp.com",
+  projectId: "wildernessdirector-755c1",
+  storageBucket: "wildernessdirector-755c1.appspot.com",
+  messagingSenderId: "777528754167",
+  appId: "1:777528754167:web:1b65fc91235ce948e938f2",
+  measurementId: "G-K9BFBXEWLQ"
 };
 
 const FirebaseProviderSDKs: FC<{ children: ReactNode }> = ({ children }) => {
