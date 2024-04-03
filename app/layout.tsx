@@ -9,9 +9,9 @@ import { ReactNode } from "react";
 const font = Work_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Venefish | Vercel Next.JS Firebase Shadcn/ui Tailwind Boilerplate",
+  title: "Wildermed | Wilderness Medicine in Southern California",
   description:
-    "Venefish is a Vercel Next.JS Firebase Shadcn/ui Tailwind Boilerplate project to help you get started with your next project.",
+    "Wildermed is a project of Coachella Valley Emergency Medicine Ultrasound. We are dedicated to providing high-quality wilderness medicine education in Southern California between Riverside University Health System and Desert Regional Medical Center.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

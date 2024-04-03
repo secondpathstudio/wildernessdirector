@@ -20,7 +20,7 @@ export const AuthCard = () => {
 
   useEffect(() => {
     if (user) {
-      router.push("/app");
+      router.push("/home");
     }
   }, [user]);
   return (

@@ -11,11 +11,11 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
 
-export default function Home() {
+export default function Fellowship() {
   return (
     <>
       <div className="grow flex flex-col items-center justify-evenly">
-        Innovating Wilderness Medicine in Southern California
+        Fellowship @ RUHS
       </div>
     </>
   );

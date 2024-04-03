@@ -1,7 +1,7 @@
 import { NavbarMobile } from "@/components/navbar/navbar-mobile";
 import { NavbarUserLinks } from "@/components/navbar/navbar-user-links";
 import { buttonVariants } from "@/components/ui/button";
-import { FishIcon, ScanTextIcon } from "lucide-react";
+import WildermedIcon from "../ui/WildermedIcon";
 import Link from "next/link";
 import { FC } from "react";
 
@@ -13,22 +13,25 @@ export const NavBar: FC = () => {
           <div className="flex items-center">
             <Link href="/" className="hover:opacity-80 transition-opacity">
               <div className="flex items-center">
-                <FishIcon className="w-8 h-8 mr-2 inline" />{" "}
-                <span className="text-xl font-semibold tracking-tighter text-slate-800 mr-6">
-                  Venefish
+              <WildermedIcon 
+                leafColor={"#283618"} 
+                strokeWidth={"#000"} 
+                crossColor={"#FEFAE0"} 
+                strokeColor={"#000"} 
+                size={24} 
+              />
+                <span className="text-xl text-[#283618] font-semibold tracking-tighter mr-6">
+                  Wildermed
                 </span>
               </div>
             </Link>
             <div className="hidden md:flex justify-between grow">
               <div>
-                <Link href="#1" className={buttonVariants({ variant: "link" })}>
-                  Item 1
+                <Link href="/fellowship" className={buttonVariants({ variant: "link" })}>
+                  Fellowship
                 </Link>
-                <Link href="#2" className={buttonVariants({ variant: "link" })}>
-                  Item 2
-                </Link>
-                <Link href="#3" className={buttonVariants({ variant: "link" })}>
-                  Item 3
+                <Link href="/fellowship" className={buttonVariants({ variant: "link" })}>
+                  App
                 </Link>
               </div>
               <div className="flex items-center space-x-4">
