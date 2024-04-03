@@ -1,7 +1,5 @@
 'use client';
-import { FC } from "react";
-import { useSearchParams } from "next/navigation";
-import { MainNav } from "@/components/dashboard/main-nav";
+import { FC, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -10,33 +8,11 @@ import {
   CardDescription,
   LinkCard,
 } from "@/components/ui/card";
-import { useFirestore, useFirestoreDoc } from "reactfire";
-import { doc } from "firebase/firestore";
 
 export const TopicOverview: FC = () => {
-  const params = useSearchParams();
-  const topicId = params?.get("topicId") || "noTopicId";
-
-  //get the topic data from the database
-  const firestore = useFirestore();
-  const topicData = doc(firestore, "topics", topicId);
-  const { status, data } = useFirestoreDoc(topicData);
-
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
 
   return (
     <>
-      <div className="hidden flex-col md:flex">
-        <div className="flex items-end justify-between space-y-2 mb-6">
-          <h2 className="text-3xl leading-5 font-bold tracking-tight">
-            {data?.data()?.topicName || "Loading..."}
-          </h2>
-        </div>
-        <div className="flex h-16 items-center bg-muted px-6 rounded-xl">
-          <MainNav />
-        </div>
         <div className="flex-1 space-y-4 pt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <LinkCard>
@@ -109,7 +85,6 @@ export const TopicOverview: FC = () => {
             </Card>
           </div>
         </div>
-      </div>
     </>
   );
 };

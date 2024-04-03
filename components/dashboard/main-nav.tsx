@@ -1,34 +1,37 @@
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
+import { FC } from "react";
 
-export function MainNav({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLElement>) {
+interface TopicNavProps {
+  changeTab: (index: number) => void,
+  activeTab: number
+}
+
+export const MainNav: FC<TopicNavProps> = ({ changeTab, ...props }) => {
   return (
     <nav
-      className={cn("flex items-center space-x-4 lg:space-x-6", className)}
+      className={cn("flex items-center space-x-4 lg:space-x-6")}
       {...props}
     >
-      <Link
-        href="#"
-        className="text-sm font-medium transition-colors hover:text-primary"
+      <button
+        onClick={() => changeTab(0)}
+        className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 0 && 'text-primary'}`}
       >
         Overview
-      </Link>
-      <Link
-        href="#"
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+      </button>
+      <button
+        onClick={() => changeTab(1)}
+        className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 1 && 'text-primary'}`}
       >
         Objectives
-      </Link>
-      <Link
-        href="#"
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+      </button>
+      <button
+        onClick={() => changeTab(2)}
+        className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 2 && 'text-primary'}`}
       >
         Questions
-      </Link>
+      </button>
     </nav>
   );
 }

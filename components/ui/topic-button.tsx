@@ -32,7 +32,7 @@ export const TopicButton = ({
   const cycleLength = 16;
   const cycleAmplitude = -200; //-200
   const cycleIndex = index % cycleLength;
-  const firstVerticalMargin = 0; //60
+  const firstVerticalMargin = 60; //60
   const defaultVerticalMargin = 24; //24
 
   let indentationLevel;
@@ -55,7 +55,6 @@ export const TopicButton = ({
 
   const Icon = isCompleted ? Check : isLast ? Crown : TreePine;
 
-  // const href = isCompleted ? `/lesson/${id}` : "/lesson";
   const href=`/home/topic?topicId=${id}`;
 
   return (

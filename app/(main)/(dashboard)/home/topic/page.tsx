@@ -1,9 +1,9 @@
-import { TopicOverview } from "@/components/topic-overview/topic-overview";
+import { TopicContainer } from "@/components/topic-overview/topic-container";
 
 const TopicPage = () => {
   return (
     <>
-      <TopicOverview />
+      <TopicContainer />
     </>
   );
 };
