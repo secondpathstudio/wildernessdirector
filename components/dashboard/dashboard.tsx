@@ -28,7 +28,7 @@ export const Dashboard: FC = () => {
       <div className="flex-col relative">
         <div className="flex items-end justify-between space-y-2 mb-6">
           <h2 className="text-3xl leading-5 font-bold tracking-tight">
-            Fellowship Journey
+            Fellowship Progress
           </h2>
         </div>
 

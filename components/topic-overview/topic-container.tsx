@@ -5,8 +5,9 @@ import { MainNav } from "@/components/dashboard/main-nav";
 import { useFirestore, useFirestoreDoc } from "reactfire";
 import { doc } from "firebase/firestore";
 import { TopicOverview } from "./topic-overview";
-import { TopicQuestions } from "./topic-questions";
+import { QuestionCreator } from "./question-creator";
 import { TopicObjectives } from "./topic-objectives";
+import { TopicQuestions } from "./topic-questions";
 
 export const TopicContainer: FC = () => {
   const params = useSearchParams();
@@ -40,6 +41,7 @@ export const TopicContainer: FC = () => {
         {activeTab === 0 && <TopicOverview />}
         {activeTab === 1 && <TopicObjectives />}
         {activeTab === 2 && <TopicQuestions />}
+        {activeTab === 3 && <QuestionCreator />}
       </div>
     </>
   );
