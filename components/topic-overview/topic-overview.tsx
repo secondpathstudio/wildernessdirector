@@ -8,8 +8,23 @@ import {
   CardDescription,
   LinkCard,
 } from "@/components/ui/card";
+import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
+import { collection, query, where } from "firebase/firestore";
 
-export const TopicOverview: FC = () => {
+interface TopicOverviewProps {
+  topicId: string;
+}
+
+export const TopicOverview: FC<TopicOverviewProps> = (props) => {
+  const auth = useAuth();
+  const firestore = useFirestore();
+  const questionsCollection = collection(firestore, "questions");
+  const questionsQuery = query(questionsCollection, 
+    where('topicId', '==', props.topicId),
+    where('authorId', '==', auth.currentUser?.uid));
+  const { status, data: questions } = useFirestoreCollectionData(questionsQuery, {
+    idField: 'id',
+  });
 
   return (
     <>
@@ -34,10 +49,7 @@ export const TopicOverview: FC = () => {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">3</div>
-                <p className="text-xs text-muted-foreground">
-                  +2 in the last week
-                </p>
+                <div className="text-2xl font-bold">{questions.length > 0 ? questions.length : "None"}</div>
               </CardContent>
             </LinkCard>
             <Card>

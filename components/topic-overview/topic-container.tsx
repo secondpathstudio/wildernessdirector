@@ -39,7 +39,7 @@ export const TopicContainer: FC = () => {
           />
         </div>
         
-        {activeTab === 0 && <TopicOverview />}
+        {activeTab === 0 && <TopicOverview topicId={topicId} />}
         {activeTab === 1 && <TopicObjectives />}
         {activeTab === 2 && <FieldReports />}
         {activeTab === 3 && <TopicQuestions topicId={topicId} />}
