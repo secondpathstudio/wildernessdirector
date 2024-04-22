@@ -28,15 +28,15 @@ export const MainNav: FC<TopicNavProps> = ({ changeTab, ...props }) => {
       </button>
       <button
         onClick={() => changeTab(2)}
-        className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 2 && 'text-primary'}`}
+        className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 3 && 'text-primary'}`}
       >
-        Questions
+        Field Reports
       </button>
       <button
         onClick={() => changeTab(3)}
-        className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 3 && 'text-primary'}`}
+        className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 2 && 'text-primary'}`}
       >
-        Question Creator
+        Questions
       </button>
     </nav>
   );

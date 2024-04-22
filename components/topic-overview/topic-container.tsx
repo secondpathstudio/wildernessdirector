@@ -8,6 +8,7 @@ import { TopicOverview } from "./topic-overview";
 import { QuestionCreator } from "./question-creator";
 import { TopicObjectives } from "./topic-objectives";
 import { TopicQuestions } from "./topic-questions";
+import { FieldReports } from "./field-reports";
 
 export const TopicContainer: FC = () => {
   const params = useSearchParams();
@@ -40,8 +41,8 @@ export const TopicContainer: FC = () => {
         
         {activeTab === 0 && <TopicOverview />}
         {activeTab === 1 && <TopicObjectives />}
-        {activeTab === 2 && <TopicQuestions />}
-        {activeTab === 3 && <QuestionCreator />}
+        {activeTab === 2 && <FieldReports />}
+        {activeTab === 3 && <TopicQuestions />}
       </div>
     </>
   );
