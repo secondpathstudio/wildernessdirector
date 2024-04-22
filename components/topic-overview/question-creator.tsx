@@ -9,13 +9,15 @@ import {
   CardDescription,
   LinkCard,
 } from "@/components/ui/card";
-import { Form } from "../ui/form";
-import { CreateMCQuestionForm, CreateQuestionForm }  from "./create-mc-question-form";
-import { Button } from "../ui/button";
+import { CreateMCQuestionForm }  from "./create-mc-question-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { CreateTFQuestionForm } from "./create-tf-question-form";
 
-export const QuestionCreator: FC = () => {
+interface QuestionCreatorProps {
+    topicId: string;
+}
+
+export const QuestionCreator: FC<QuestionCreatorProps> = (props) => {
 
   return (
     <Card className="col-span-3">
@@ -28,10 +30,10 @@ export const QuestionCreator: FC = () => {
               <TabsTrigger value={"tf"}>True/False</TabsTrigger>
             </TabsList>
             <TabsContent value={"mc"}>
-              <CreateMCQuestionForm />
+              <CreateMCQuestionForm topicId={props.topicId} />
             </TabsContent>
             <TabsContent value={"tf"}>
-              <CreateTFQuestionForm />
+              <CreateTFQuestionForm topicId={props.topicId} />
             </TabsContent>
           </Tabs>
         </CardContent>

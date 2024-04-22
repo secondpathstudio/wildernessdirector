@@ -9,9 +9,11 @@ import { useAuth } from "reactfire";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 
-interface QuestionFormProps {}
+interface QuestionFormProps {
+  topicId: string;
+}
 
-export const CreateMCQuestionForm: FC<QuestionFormProps> = () => {
+export const CreateMCQuestionForm: FC<QuestionFormProps> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [question, setQuestion] = useState({
     questionText: "",
@@ -47,7 +49,7 @@ export const CreateMCQuestionForm: FC<QuestionFormProps> = () => {
         ],
         reference: "",
         explanation: "",
-        topicId: "",
+        topicId: props.topicId ? props.topicId : "unknownTopicId",
       });
     } catch (error) {
       console.error(error);
@@ -82,7 +84,7 @@ export const CreateMCQuestionForm: FC<QuestionFormProps> = () => {
         </div>
 
         {Array.from({ length: 4 }).map((_, i) => (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1" key={i}>
             <div className="w-full">
               <label>Answer {i}</label>
               <div className="flex items-center gap-1">

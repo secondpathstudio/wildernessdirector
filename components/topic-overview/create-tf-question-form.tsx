@@ -1,85 +1,121 @@
 'use client';
 
 import * as React from "react";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { FC, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "reactfire";
+import { useAuth, useFirestore } from "reactfire";
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Textarea } from "../ui/textarea";
+import { Timestamp, addDoc, collection } from "firebase/firestore";
 
-
-const formSchema = z.object({
-  questionText: z.string().min(1).max(500),
-  answerText: z.string().min(1).max(150),
-});
 
 interface QuestionFormProps {
-  
+  topicId: string;
 }
 
-export const CreateTFQuestionForm: FC<QuestionFormProps> = () => {
+export const CreateTFQuestionForm: FC<QuestionFormProps> = (props) => {
+  const firestore = useFirestore();
+  const questionsCollection = collection(firestore, "questions");
   const [isLoading, setIsLoading] = useState(false);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      questionText: "",
-      answerText: "",
-    },
+  const [question, setQuestion] = useState({
+    questionText: "",
+    answer: true,
+    reference: "",
+    explanation: "",
+    topicId: props.topicId ? props.topicId : "unknownTopicId",
   });
 
   const auth = useAuth();
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    if (auth.currentUser === null) {
+      toast({
+        title: "You need to be logged in to create a question",
+      })
+      setIsLoading(false);
+      return;
+    }
+
+    //upload question to firestore "questions" collection with auto generated id
+    try {
+      const newQuestionRef = await addDoc(questionsCollection, {
+        ...question,
+        authorId: auth.currentUser.uid,
+        createdAt: Timestamp.now(),
+      });
+      toast({
+        title: "Question created",
+        description: `Question created successfully! ID: ${newQuestionRef.id}`,
+      });
+
+    } catch (error : any) {
+      //TODO use toast
+      console.log(error)
+    }
+
+    //reset question
+    setQuestion({
+      questionText: "",
+      answer: false,
+      reference: "",
+      explanation: "",
+      topicId: props.topicId ? props.topicId : "unknownTopicId",
+    });
+
+    setIsLoading(false);
+  }
+
   return (
-    <>
-      <Form {...form}>
-        <form onSubmit={() => console.log("submitted")}>
-          <fieldset disabled={isLoading} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="questionText"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>True/False Question</FormLabel>
-                  <FormControl>
-                    <div className="flex gap-3">
-                    <Input type="textarea" {...field} />
-                    <div className="">
-                      <RadioGroup defaultValue="option-one">
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="option-one" id="option-one" />
-                          <Label htmlFor="option-one">True</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="option-two" id="option-two" />
-                          <Label htmlFor="option-two">False</Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+    <form onSubmit={handleSubmit}>
+      <fieldset disabled={isLoading} className="space-y-4">
+        <label>Question</label>
+        <div className="flex items-center gap-1">
+            <Textarea
+              placeholder="Question text..."
+              value={question.questionText}
+              onChange={(e) => setQuestion({ ...question, questionText: e.target.value })}
             />
-            <Button type="submit">Create Question</Button>
-          </fieldset>
-        </form>
-      </Form>
-    </>
+        </div>
+        <RadioGroup 
+          defaultValue="true" 
+          className="flex"
+          onValueChange={(e) => setQuestion({ ...question, answer: e === "true" ? true : false})}
+        >
+          <div className="flex gap-1">
+          <RadioGroupItem value="true" />
+          <Label>True</Label>
+          </div>
+          <div className="flex gap-1">
+          <RadioGroupItem value="false" />
+          <Label>False</Label>
+          </div>
+        </RadioGroup>
+        <div className="w-full">
+          <label>Explanation</label>
+          <Textarea
+            placeholder="Explanation for the correct answer..."
+            className=""
+            value={question.explanation}
+            onChange={(e) => setQuestion({ ...question, explanation: e.target.value })}
+          />
+        </div>
+        <div className="w-full">
+          <label>Reference</label>
+          <Input
+            className="grow"
+            type="text"
+            value={question.reference}
+            onChange={(e) => setQuestion({ ...question, reference: e.target.value })}
+          />
+        </div>
+        <Button type="submit">Create Question</Button>
+      </fieldset>
+    </form>
   );
 };
