@@ -108,9 +108,9 @@ export const CreateMCQuestionForm: FC<QuestionFormProps> = (props) => {
         </div>
 
         {Array.from({ length: 4 }).map((_, i) => (
-          <div className="flex items-center gap-1" key={i}>
+          <div className="flex gap-1" key={i}>
             <div className="w-full">
-              <label>Answer {i}</label>
+              <label>Answer {i+1}</label>
               <div className="flex items-center gap-1">
                 <Input
                   className="grow"
@@ -118,13 +118,11 @@ export const CreateMCQuestionForm: FC<QuestionFormProps> = (props) => {
                   value={question.answers[i].text}
                   onChange={(e) => updateAnswerText(i, e.target.value)}
                 />
-              </div>
-            </div>
-            <div>
-              <Checkbox
+                <Checkbox
                 checked={question.answers[i].correct}
                 onCheckedChange={(e) => updateAnswerValue(i, e as boolean)}
               />
+              </div>
             </div>
           </div>
         ))}
