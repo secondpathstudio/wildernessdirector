@@ -5,18 +5,22 @@ import { FC, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "reactfire";
+import { useAuth, useFirestore } from "reactfire";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { Timestamp, addDoc, collection } from "firebase/firestore";
 
 interface QuestionFormProps {
   topicId: string;
 }
 
 export const CreateMCQuestionForm: FC<QuestionFormProps> = (props) => {
+  const firestore = useFirestore();
+  const questionsCollection = collection(firestore, "questions");
   const [isLoading, setIsLoading] = useState(false);
   const [question, setQuestion] = useState({
     questionText: "",
+    questionType: "Multiple Choice",
     answers: [
       { text: "", correct: false },
       { text: "", correct: false },
@@ -25,7 +29,7 @@ export const CreateMCQuestionForm: FC<QuestionFormProps> = (props) => {
     ],
     reference: "",
     explanation: "",
-    topicId: "",
+    topicId: props.topicId ? props.topicId : "unknownTopicId",
   
   })
 
@@ -35,28 +39,48 @@ export const CreateMCQuestionForm: FC<QuestionFormProps> = (props) => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      // Do something with the form values.
-      console.log(question);
-      // Reset form fields
-      setQuestion({
-        questionText: "",
-        answers: [
-          { text: "", correct: false },
-          { text: "", correct: false },
-          { text: "", correct: false },
-          { text: "", correct: false },
-        ],
-        reference: "",
-        explanation: "",
-        topicId: props.topicId ? props.topicId : "unknownTopicId",
-      });
-    } catch (error) {
-      console.error(error);
-    } finally {
+    if (auth.currentUser === null) {
+      toast({
+        title: "You need to be logged in to create a question",
+      })
       setIsLoading(false);
+      return;
     }
-  };
+
+    //upload question to firestore "questions" collection with auto generated id
+    try {
+      const newQuestionRef = await addDoc(questionsCollection, {
+        ...question,
+        authorId: auth.currentUser.uid,
+        createdAt: Timestamp.now(),
+      });
+      toast({
+        title: "Question created",
+        description: `Question created successfully! ID: ${newQuestionRef.id}`,
+      });
+
+    } catch (error : any) {
+      //TODO use toast
+      console.log(error)
+    }
+
+    //reset question
+    setQuestion({
+      questionText: "",
+      questionType: "Multiple Choice",
+      answers: [
+        { text: "", correct: false },
+        { text: "", correct: false },
+        { text: "", correct: false },
+        { text: "", correct: false },
+      ],
+      reference: "",
+      explanation: "",
+      topicId: props.topicId ? props.topicId : "unknownTopicId",
+    });
+
+    setIsLoading(false);
+  }
 
   const updateAnswerText = (index: number, text: string) => {
     const newAnswers = [...question.answers];

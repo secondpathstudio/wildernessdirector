@@ -65,7 +65,7 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
                     <TableRow>
                       <TableHead className="">Date Added</TableHead>
                       <TableHead>Question Text</TableHead>
-                      <TableHead>Answer</TableHead>
+                      <TableHead>Type</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -79,7 +79,7 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
                       <TableRow key={question.id}>
                         <TableCell>{question.createdAt.toDate().toLocaleDateString()}</TableCell>
                         <TableCell>{question.questionText}</TableCell>
-                        <TableCell>{question.answer ? "True" : "False"}</TableCell>
+                        <TableCell>{question.questionType}</TableCell>
                         <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleQuestionDelete(question.id)}>Delete</TableCell>
                       </TableRow>
                     ))}

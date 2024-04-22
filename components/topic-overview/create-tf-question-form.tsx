@@ -22,6 +22,7 @@ export const CreateTFQuestionForm: FC<QuestionFormProps> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [question, setQuestion] = useState({
     questionText: "",
+    questionType: "True/False",
     answer: true,
     reference: "",
     explanation: "",
@@ -62,6 +63,7 @@ export const CreateTFQuestionForm: FC<QuestionFormProps> = (props) => {
     //reset question
     setQuestion({
       questionText: "",
+      questionType: "True/False",
       answer: false,
       reference: "",
       explanation: "",
