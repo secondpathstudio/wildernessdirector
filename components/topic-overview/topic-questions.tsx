@@ -57,6 +57,11 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
     }
   }
 
+  //TODO how to make this responsive rather than fixed?
+  const truncateQuestion = (questionText: string) => {
+    return questionText.length > 50 ? questionText.substring(0, 50) + '...' : questionText;
+  }
+
   return (
     <>
         <div className="flex-1 space-y-4 pt-6">
@@ -89,7 +94,11 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
                         
                         <TableRow key={question.id}>
                           <TableCell>{question.createdAt.toDate().toLocaleDateString()}</TableCell>
-                          <TableCell><DialogTrigger>{question.questionText}</DialogTrigger></TableCell>
+                          <TableCell>
+                            <DialogTrigger>
+                              {truncateQuestion(question.questionText)}
+                            </DialogTrigger>
+                          </TableCell>
                           <TableCell>{question.questionType}</TableCell>
                           <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleQuestionDelete(question.id)}>Delete</TableCell>
                         </TableRow>
