@@ -22,7 +22,7 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
   const questionsQuery = query(questionsCollection, 
     where('topicId', '==', props.topicId),
     where('authorId', '==', auth.currentUser?.uid));
-  const { status, data: questions } = useFirestoreCollectionData(questionsQuery, {
+  const { status: questionStatus, data: questions } = useFirestoreCollectionData(questionsQuery, {
     idField: 'id',
   });
 
@@ -49,7 +49,15 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{questions.length > 0 ? questions.length : "None"}</div>
+                {questionStatus === "loading" && (
+                  <div className="text-2xl font-bold">...</div>
+                )}
+                {questionStatus === "error" && (
+                  <div className="text-2xl font-bold">!</div>
+                )}
+                {questionStatus === "success" && (
+                  <div className="text-2xl font-bold">{questions.length}</div>
+                )}
               </CardContent>
             </LinkCard>
             <Card>

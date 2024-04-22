@@ -17,6 +17,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { QuestionCreator } from "./question-creator";
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, deleteDoc, doc, orderBy, query, where } from "firebase/firestore";
@@ -76,12 +85,46 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
                     )
                     :
                     questions.map((question: any) => (
-                      <TableRow key={question.id}>
-                        <TableCell>{question.createdAt.toDate().toLocaleDateString()}</TableCell>
-                        <TableCell>{question.questionText}</TableCell>
-                        <TableCell>{question.questionType}</TableCell>
-                        <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleQuestionDelete(question.id)}>Delete</TableCell>
-                      </TableRow>
+                      <Dialog>
+                        
+                        <TableRow key={question.id}>
+                          <TableCell>{question.createdAt.toDate().toLocaleDateString()}</TableCell>
+                          <TableCell><DialogTrigger>{question.questionText}</DialogTrigger></TableCell>
+                          <TableCell>{question.questionType}</TableCell>
+                          <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleQuestionDelete(question.id)}>Delete</TableCell>
+                        </TableRow>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Question</DialogTitle>
+                            <DialogDescription>{question.questionText}</DialogDescription>
+                          </DialogHeader>
+                            {question.questionType === 'Multiple Choice' && (
+                              <DialogHeader>
+                                <DialogTitle>Answers</DialogTitle>
+                                <ul>
+                                  {question.answers.map((answerChoice: any, index: number) => (
+                                    <li key={index}>
+                                      <DialogDescription className={`${answerChoice.correct && 'font-bold text-primary'}`}>{answerChoice.text}</DialogDescription>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </DialogHeader>
+                            )}
+                            {question.questionType === 'True/False' && (
+                              <DialogHeader>
+                                <DialogTitle>Answer</DialogTitle>
+                                <DialogDescription>{question.answer.toString()}</DialogDescription>
+                              </DialogHeader>
+                            )}
+                          <DialogTitle>Explanation</DialogTitle>
+                          <DialogDescription>{question.explanation}</DialogDescription>
+                          <DialogTitle>Reference</DialogTitle>
+                            <DialogDescription>{question.reference}</DialogDescription>
+                          <DialogFooter>
+                            <DialogDescription className="italic text-sm opacity-30">Created on {question.createdAt.toDate().toLocaleDateString()}</DialogDescription>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                     ))}
                   </TableBody>
                 </Table>
