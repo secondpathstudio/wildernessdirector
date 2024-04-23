@@ -7,9 +7,10 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { GithubIcon } from "lucide-react";
 import { FC, useState } from "react";
-import { useAuth } from "reactfire";
+import { useAuth, useFirestore } from "reactfire";
 
 interface Props {
   onSignIn?: () => void;
@@ -17,13 +18,29 @@ interface Props {
 
 export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
   const auth = useAuth();
+  const firestore = useFirestore();
   const [isLoading, setIsLoading] = useState(false);
 
   const doProviderSignIn = async (provider: GoogleAuthProvider) => {
     try {
       setIsLoading(true);
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
       // create user in your database here
+
+      const user = result.user;
+      if (user?.uid && user.email) {
+        try {
+          await setDoc(doc(firestore, `users/${user.uid}`), {
+            email: user.email,
+            name: user.displayName || "",
+            createdAt: new Date().toISOString(),
+          });
+        } catch (err) {
+          console.error(err);
+          toast({ title: "Error creating user", description: `${err}` });
+        }
+      }
+
       toast({ title: "Signed in!" });
       onSignIn?.();
     } catch (err: any) {
@@ -40,11 +57,7 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
         disabled={isLoading}
         onClick={async () => {
           const provider = new GoogleAuthProvider();
-          toast({
-            title: "Oops!",
-            description: "Provider not configured, yet.",
-          });
-          // await doProviderSignIn(provider);
+          await doProviderSignIn(provider);
         }}
       >
         <svg
@@ -58,7 +71,7 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
         </svg>
         Google
       </Button>
-      <Button
+      {/* <Button
         className="w-60 mt-4"
         disabled={isLoading}
         onClick={async () => {
@@ -72,7 +85,7 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
       >
         <GithubIcon className="w-4 h-4 mr-2" />
         Github
-      </Button>
+      </Button> */}
     </>
   );
 };
