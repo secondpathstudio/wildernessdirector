@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -29,6 +30,8 @@ import {
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, deleteDoc, doc, orderBy, query, where } from "firebase/firestore";
 import { FieldReportCreator } from "./field-report-creator";
+import { FieldReport, FieldReportEditor } from "./field-report-editor";
+import { Button } from "../ui/button";
 
 //create props to accept topicId string
 interface FieldReportsProps {
@@ -48,6 +51,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
   const { status, data: fieldReports } = useFirestoreCollectionData(fieldReportsQuery, {
     idField: 'id',
   });
+  const [editingFieldReport, setEditingFieldReport] = useState<FieldReport | null>(null);
 
   const handleFieldReportDelete = async (fieldReportId: string) => {
     try {
@@ -91,7 +95,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                     :
                     fieldReports.map((report: any) => (
                       <Dialog>
-                        <TableRow key={report.id}>
+                        <TableRow key={report.id} className={`${report === editingFieldReport && "bg-primary rounded-lg"}`}>
                           <TableCell>{report.activityDate.toDate().toLocaleDateString()}</TableCell>
                           <TableCell>
                             <DialogTrigger>
@@ -99,7 +103,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                             </DialogTrigger>
                           </TableCell>
                           <TableCell>{report.activity}</TableCell>
-                          <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleFieldReportDelete(report.id)}>Delete</TableCell>
+                          {/* <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleFieldReportDelete(report.id)}>Delete</TableCell> */}
                         </TableRow>
                         <DialogContent className="max-h-screen overflow-scroll">
                           <DialogHeader>
@@ -112,6 +116,11 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
 
                           <DialogTitle>Report</DialogTitle>
                           <DialogDescription>{report.reportText}</DialogDescription>
+                          <DialogClose asChild>
+                            <Button type="button" className="mt-2" onClick={() => setEditingFieldReport(report)}>
+                                Edit
+                            </Button>
+                          </DialogClose>
                           <DialogFooter>
                             <DialogDescription className="italic text-sm opacity-30">Created on {report.createdAt.toDate().toLocaleDateString()}</DialogDescription>
                           </DialogFooter>
@@ -123,7 +132,11 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                 )}
               </CardContent>
             </Card>
-            <FieldReportCreator topicId={props.topicId} />
+            {editingFieldReport != null ? (
+              <FieldReportEditor editingFieldReport={editingFieldReport} setEditingFieldReport={setEditingFieldReport}/>
+            ) :
+              <FieldReportCreator topicId={props.topicId} />
+            }
           </div>
         </div>
     </>

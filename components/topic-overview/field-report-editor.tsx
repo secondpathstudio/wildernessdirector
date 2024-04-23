@@ -19,29 +19,36 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { useAuth, useFirestore } from "reactfire";
 import { toast } from "../ui/use-toast";
-import { Timestamp, addDoc, collection } from "firebase/firestore";
+import { Timestamp, addDoc, collection, doc, updateDoc } from "firebase/firestore";
 
-interface FieldReportCreatorProps {
-    topicId: string;
+export type FieldReport = {
+  id: string | null,
+  reportText: string,
+  reportTitle: string,
+  activity: string,
+  activityDate: Timestamp,
 }
 
-export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
+interface FieldReportEditorProps {
+    editingFieldReport: FieldReport;
+    setEditingFieldReport: (fieldReport: FieldReport | null) => void;
+}
+
+export const FieldReportEditor: FC<FieldReportEditorProps> = (props) => {
   const firestore = useFirestore();
   const fieldReportsCollection = collection(firestore, "fieldReports");
   const [isLoading, setIsLoading] = useState(false);
-  const [fieldReport, setFieldReport] = useState({
-    reportText: "",
-    reportTitle: "",
-    activity: "",
-    activityDate: Timestamp.now().toDate(),
-    topicId: props.topicId ? props.topicId : "unknownTopicId",
-  })
+  const [fieldReport, setFieldReport] = useState(props.editingFieldReport)
 
   const auth = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    if (props.editingFieldReport.id === null) {
+      return;
+    }
 
     if (auth.currentUser === null) {
       toast({
@@ -51,17 +58,18 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
       return;
     }
 
-    //upload report to firestore "fieldReports" collection with auto generated id
+    //replace existing field report with updated field report
     try {
-      const newReportRef = await addDoc(fieldReportsCollection, {
+      const reportDoc = doc(firestore, "fieldReports", props.editingFieldReport.id);
+      await updateDoc(reportDoc, {
         ...fieldReport,
         authorId: auth.currentUser.uid,
         authorName: auth.currentUser.displayName || "NoName",
         createdAt: Timestamp.now(),
       });
       toast({
-        title: "Report created",
-        description: `Field report created successfully! ID: ${newReportRef.id}`,
+        title: "Report updated successfully!",
+        description: `Field report created successfully! ID: ${fieldReport.id}`,
       });
 
     } catch (error : any) {
@@ -70,13 +78,7 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
     }
 
     //reset question
-    setFieldReport({
-      reportText: "",
-      reportTitle: "",
-      activity: "",
-      activityDate: Timestamp.now().toDate(),
-      topicId: props.topicId ? props.topicId : "unknownTopicId",
-    });
+    props.setEditingFieldReport(null);
 
     setIsLoading(false);
   }
@@ -85,14 +87,15 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
   return (
     <Card className="col-span-3">
       <CardHeader>
-        <CardTitle className="pb-2">Field Report Creator</CardTitle>
+        <CardTitle className="pb-2">Field Report Editor</CardTitle>
       </CardHeader>
       <CardContent className="flex-col gap-10">
       <form onSubmit={handleSubmit}>
       <fieldset disabled={isLoading} className="space-y-4">
         {/* Date of Field report */}
-        <DatePicker 
-          onSelect={(date) => setFieldReport({...fieldReport, activityDate: date})}
+        <DatePicker
+          selectedDate={fieldReport.activityDate.toDate()}
+          onSelect={(date) => setFieldReport({...fieldReport, activityDate: Timestamp.fromDate(date)})}
         />
 
         {/* Type of activity */}
@@ -129,7 +132,8 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
           />
 
         {/* Submit button */}
-        <Button>Create Report</Button>
+        <Button>Update Report</Button>
+        <Button variant="destructive" onClick={() => props.setEditingFieldReport(null)}>Cancel</Button>
         </fieldset>
         </form>
       </CardContent>

@@ -57,7 +57,7 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+          {/* <DropdownMenuItem>Settings</DropdownMenuItem> */}
           {/* <DropdownMenuItem>Billing</DropdownMenuItem>
           <DropdownMenuItem>Profile</DropdownMenuItem>
           <DropdownMenuItem>New Team</DropdownMenuItem> */}

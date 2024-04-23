@@ -15,10 +15,11 @@ import {
 
 interface DatePickerProps {
   onSelect: (date: Date) => void
+  selectedDate: Date
 }
 
 export const DatePicker: React.FC<DatePickerProps> = (props) => {
-  const [date, setDate] = React.useState<Date>()
+  const [date, setDate] = React.useState<Date>(props.selectedDate)
 
   const handleSelectDate = (date: Date) => {
     setDate(date)
@@ -43,7 +44,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={handleSelectDate}
+          onSelect={(d) => handleSelectDate(d!)}
           initialFocus
         />
       </PopoverContent>
