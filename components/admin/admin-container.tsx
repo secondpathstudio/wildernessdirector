@@ -1,34 +1,18 @@
 'use client';
 import { FC, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { MainNav } from "@/components/dashboard/main-nav";
 import { useAuth, useFirestore, useFirestoreDoc, useUser } from "reactfire";
-import { doc } from "firebase/firestore";
 import { AdminOverview } from "./admin-overview";
 import { AdminFieldReports } from "./admin-field-reports";
 import { AdminTopicQuestions } from "./admin-questions";
 import { AdminTopics } from "./admin-topics";
-import { AdminObjectiveCreator } from "./admin-objective-creator";
-import { string } from "zod";
-import { AdminTopicObjectives } from "./admin-topic-objectives";
 
 export const AdminContainer: FC = () => {
     const user = useUser();
   const [activeTab, setActiveTab] = useState(0); 
-
-  //get the user data from the database
   const firestore = useFirestore();
-//   const userDoc = doc(firestore, "users", user.data?.uid);
-//   const { status, data: userData } = useFirestoreDoc(userDoc);
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-//   //check if admin
-//     if (!userData?.data()?.isAdmin) {
-//         return <div>Not an admin</div>;
-//     }
+//TODO ADD ADMIN AUTHENTICATION
 
   return (
     <>
