@@ -91,7 +91,6 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                     :
                     fieldReports.map((report: any) => (
                       <Dialog>
-                        
                         <TableRow key={report.id}>
                           <TableCell>{report.activityDate.toDate().toLocaleDateString()}</TableCell>
                           <TableCell>

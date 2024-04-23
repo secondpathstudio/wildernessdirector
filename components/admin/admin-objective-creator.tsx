@@ -19,6 +19,7 @@ import { toast } from "../ui/use-toast";
 import { Timestamp, addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import Link from "next/link";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 
 interface AdminObjectiveCreatorProps {
     topicId: string;
@@ -140,12 +141,35 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
                     )
                     :
                     topicData.data().objectives?.map((objective: any, index: number) => (
+                      <Dialog>
                         <TableRow key={index}>
                           <TableCell>{objective.type}</TableCell>
-                          <TableCell>{objective.text}</TableCell>
+                          <DialogTrigger>
+                            <TableCell>{objective.text}</TableCell>
+                          </DialogTrigger>
                           <TableCell>{objective.chapter ? objective.chapter : ""}</TableCell>
-                          <TableCell className="hover:cursor-pointer hover:bg-red-500" onClick={() => handleObjectiveDelete(index)}>Delete</TableCell>
+                          {/* <TableCell className="hover:cursor-pointer hover:bg-red-500" onClick={() => handleObjectiveDelete(index)}>Delete</TableCell> */}
                         </TableRow>
+                        <DialogContent className="max-h-screen overflow-scroll">
+                          <DialogHeader>
+                            <DialogTitle>Objective Details</DialogTitle>
+                            <DialogDescription>{objective.text}</DialogDescription>
+                            {objective.chapter && (
+                              <>
+                              <DialogTitle>Reading Chapter</DialogTitle>
+                              <DialogDescription>{objective.chapter}</DialogDescription>
+                              </>
+                            )}
+                          </DialogHeader>
+                            
+                          <DialogTitle>Objective Type</DialogTitle>
+                          <DialogDescription>{objective.type}</DialogDescription>
+                          <DialogFooter>
+                            <Button onClick={() => handleObjectiveDelete(index)}>Delete</Button>
+                            <DialogDescription className="italic text-sm opacity-30">Created on {objective.createdAt.toDate().toLocaleDateString()}</DialogDescription>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                     ))}
                   </TableBody>
                 </Table>
