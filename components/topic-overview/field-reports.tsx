@@ -65,8 +65,8 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
   return (
     <>
         <div className="flex-1 space-y-4 pt-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-3">
               <CardHeader>
                 <CardTitle>Field Reports</CardTitle>
               </CardHeader>
@@ -102,7 +102,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                           <TableCell>{report.activity}</TableCell>
                           <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleFieldReportDelete(report.id)}>Delete</TableCell>
                         </TableRow>
-                        <DialogContent>
+                        <DialogContent className="max-h-screen overflow-scroll">
                           <DialogHeader>
                             <DialogTitle>Field Report</DialogTitle>
                             <DialogDescription>{report.reportTitle}</DialogDescription>
