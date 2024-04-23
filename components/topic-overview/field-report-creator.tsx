@@ -92,6 +92,7 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
       <fieldset disabled={isLoading} className="space-y-4">
         {/* Date of Field report */}
         <DatePicker 
+          selectedDate={fieldReport.activityDate}
           onSelect={(date) => setFieldReport({...fieldReport, activityDate: date})}
         />
 
