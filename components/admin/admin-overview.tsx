@@ -11,11 +11,8 @@ import {
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, query, where } from "firebase/firestore";
 
-interface AdminOverviewProps {
-  topicId: string;
-}
 
-export const AdminOverview: FC<AdminOverviewProps> = (props) => {
+export const AdminOverview: FC = (props) => {
   const auth = useAuth();
   const firestore = useFirestore();
   const usersCollection = collection(firestore, "users");
@@ -41,7 +38,7 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
                     <div className="text-2xl font-bold">Users</div>
                     <div>
                       {users.map((user: any) => (
-                        <LinkCard key={user.id} href={`/admin/user/${user.id}`}>
+                        <LinkCard key={user.id} href="#">
                           <CardDescription>
                             {user.email}
                           </CardDescription>

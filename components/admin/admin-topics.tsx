@@ -29,17 +29,9 @@ import {
 } from "@/components/ui/dialog"
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, orderBy, query, where } from "firebase/firestore";
-import { AdminObjectiveCreator } from "./admin-objective-creator";
-import { Button } from "../ui/button";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-interface AdminTopicObjectivesProps {
-  topicId: string;
-}
-
-
-export const AdminTopics: FC<AdminTopicObjectivesProps> = (props) => {
+export const AdminTopics: FC = () => {
   const auth = useAuth();
   const [currentTopic, setCurrentTopic] = useState<any>(null);
   const firestore = useFirestore();
@@ -74,7 +66,7 @@ export const AdminTopics: FC<AdminTopicObjectivesProps> = (props) => {
                   <TableBody>
                     {topics.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={3}>No questions found</TableCell>
+                        <TableCell colSpan={3}>No Topics found</TableCell>
                       </TableRow>
                     )
                     :
@@ -92,6 +84,7 @@ export const AdminTopics: FC<AdminTopicObjectivesProps> = (props) => {
                 )}
               </CardContent>
             </Card>
+            
           </div>
         </div>
     </>

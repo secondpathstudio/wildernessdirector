@@ -8,11 +8,12 @@ import { AdminOverview } from "./admin-overview";
 import { AdminFieldReports } from "./admin-field-reports";
 import { AdminTopicQuestions } from "./admin-questions";
 import { AdminTopics } from "./admin-topics";
+import { AdminObjectiveCreator } from "./admin-objective-creator";
+import { string } from "zod";
+import { AdminTopicObjectives } from "./admin-topic-objectives";
 
 export const AdminContainer: FC = () => {
     const user = useUser();
-  const params = useSearchParams();
-  const topicId = params?.get("topicId") || "noTopicId";
   const [activeTab, setActiveTab] = useState(0); 
 
   //get the user data from the database
@@ -44,10 +45,11 @@ export const AdminContainer: FC = () => {
           />
         </div>
         
-        {activeTab === 0 && <AdminOverview topicId={topicId} />}
-        {activeTab === 1 && <AdminTopics topicId={topicId} />}
+        {activeTab === 0 && <AdminOverview />}
+        {activeTab === 1 && <AdminTopics />}
         {activeTab === 2 && <AdminFieldReports />}
         {activeTab === 3 && <AdminTopicQuestions />}
+        
       </div>
     </>
   );

@@ -1,32 +1,6 @@
 'use client';
 import { FC, useState } from "react";
 import { MainNav } from "@/components/dashboard/main-nav";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-  LinkCard,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, orderBy, query, where } from "firebase/firestore";
 import { AdminObjectiveCreator } from "./admin-objective-creator";
@@ -35,12 +9,8 @@ import { useSearchParams } from "next/navigation";
 
 
 export const AdminTopicObjectives: FC = () => {
-  const auth = useAuth();
   const params = useSearchParams();
   const topicId = params?.get("topicId") || "noTopicId";
-  const [currentTopic, setCurrentTopic] = useState<any>(null);
-  const firestore = useFirestore();
-  const [isAscending, setIsAscending] = useState(true);
 
   return (
     <>
