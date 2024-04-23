@@ -36,7 +36,7 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
   return (
     <>
       <Button
-        className="w-full"
+        className="w-60 mt-4"
         disabled={isLoading}
         onClick={async () => {
           const provider = new GoogleAuthProvider();
@@ -59,7 +59,7 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
         Google
       </Button>
       <Button
-        className="w-full"
+        className="w-60 mt-4"
         disabled={isLoading}
         onClick={async () => {
           const provider = new GithubAuthProvider();

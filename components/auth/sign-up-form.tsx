@@ -18,7 +18,8 @@ import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useAuth } from "reactfire";
+import { useAuth, useFirestore } from "reactfire";
+import { Timestamp, doc, setDoc } from "firebase/firestore";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -32,7 +33,7 @@ interface SignUpFormProps {
 
 export const SignUpForm: FC<SignUpFormProps> = ({ onShowLogin, onSignUp }) => {
   const [isLoading, setIsLoading] = useState(false);
-
+  const firestore = useFirestore();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,6 +50,17 @@ export const SignUpForm: FC<SignUpFormProps> = ({ onShowLogin, onSignUp }) => {
       const user = await createUserWithEmailAndPassword(auth, email, password);
       if (user?.user.uid && user.user.email) {
         // create user in firestore here if you want
+        try {
+          await setDoc(doc(firestore, `users/${user.user.uid}`), {
+            email: user.user.email,
+            createdAt: Timestamp.now(),
+            name: user.user.displayName || "",
+            isAdmin: false,
+          });
+        } catch (err) {
+          console.error(err);
+        }
+
         toast({ title: "Account created!" });
         onSignUp?.();
       }

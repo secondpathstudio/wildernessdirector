@@ -25,6 +25,13 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
   const { status: questionStatus, data: questions } = useFirestoreCollectionData(questionsQuery, {
     idField: 'id',
   });
+  const fieldReportsCollection = collection(firestore, "fieldReports");
+  const fieldReportsQuery = query(fieldReportsCollection, 
+    where('topicId', '==', props.topicId),
+    where('authorId', '==', auth.currentUser?.uid));
+  const { status: fieldReportStatus, data: fieldReports } = useFirestoreCollectionData(fieldReportsQuery, {
+      idField: 'id',
+  });
 
   return (
     <>
@@ -63,7 +70,7 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Objectives Completed
+                  Field Reports
                 </CardTitle>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -81,10 +88,15 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">+4</div>
-                <p className="text-xs text-muted-foreground">
-                  +4 in the last week
-                </p>
+                {fieldReportStatus === "loading" && (
+                  <div className="text-2xl font-bold">...</div>
+                )}
+                {fieldReportStatus === "error" && (
+                  <div className="text-2xl font-bold">Error loading reports...</div>
+                )}
+                {fieldReportStatus === "success" && (
+                  <div className="text-2xl font-bold">{fieldReports.length}</div>
+                )}
               </CardContent>
             </Card>
           </div>

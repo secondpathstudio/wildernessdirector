@@ -48,6 +48,7 @@ export const CreateTFQuestionForm: FC<QuestionFormProps> = (props) => {
       const newQuestionRef = await addDoc(questionsCollection, {
         ...question,
         authorId: auth.currentUser.uid,
+        authorName: auth.currentUser.displayName ? auth.currentUser.displayName : "unknown",
         createdAt: Timestamp.now(),
       });
       toast({
