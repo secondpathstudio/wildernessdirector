@@ -30,7 +30,7 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
     <>
         <div className="flex-1 space-y-4 pt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <LinkCard>
+            <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Questions Submitted
@@ -59,7 +59,7 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
                   <div className="text-2xl font-bold">{questions.length}</div>
                 )}
               </CardContent>
-            </LinkCard>
+            </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -94,14 +94,6 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
                 <CardTitle>Overview</CardTitle>
               </CardHeader>
               <CardContent className="pl-2">{/* <Overview /> */}</CardContent>
-            </Card>
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Topic Questions</CardTitle>
-                <CardDescription>
-                  You've submitted 2 questions for this topic.
-                </CardDescription>
-              </CardHeader>
             </Card>
           </div>
         </div>
