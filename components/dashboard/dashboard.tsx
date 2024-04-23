@@ -25,6 +25,8 @@ export const Dashboard: FC = () => {
     idField: 'id'
   });
 
+  
+
   if (auth.currentUser === null) {
     return (
       <div className="flex justify-center items-center w-full">
@@ -52,34 +54,37 @@ export const Dashboard: FC = () => {
           </h2>
         </div>
 
-        {/* <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 auto-rows-max gap-6 gap-y-20"> */}
-        {topics && topics.docs.map((topic,i) => {
-          const isCurrent = topic.data().topicNumber === 0;
-          const isLocked = !topic.data().isCompleted && !isCurrent;
+        <div className="flex">
+          <div>
+            {topics && topics.docs.map((topic,i) => {
+              const isCurrent = topic.data().topicNumber === 0;
+              const isLocked = !topic.data().isCompleted && !isCurrent;
 
-          return (
-            <>
-              {/* <TopicBanner 
-                title={topic.data().topicName}
-                description={topic.data().chapters}
-              /> */}
+              return (
+                <>
+                  {/* <TopicBanner 
+                    title={topic.data().topicName}
+                    description={topic.data().chapters}
+                  /> */}
 
-                {/* <div className="bg-primary h-5 w-5">
-                </div> */}
-                <TopicButton
-                  topicName={topic.data().topicName}
-                  key={topic.id}
-                  id={topic.id}
-                  index={i}
-                  totalCount={11}
-                  locked={isLocked} 
-                  current={isCurrent}
-                  percentage={0}
-                />
-            </>
-          )
-        })}
+                    {/* <div className="bg-primary h-5 w-5">
+                    </div> */}
+                    <TopicButton
+                      topicName={topic.data().topicName}
+                      key={topic.id}
+                      id={topic.id}
+                      index={i}
+                      totalCount={11}
+                      locked={isLocked} 
+                      current={isCurrent}
+                      percentage={0}
+                    />
+                </>
+              )
+            })}
+            </div>
         </div>
+      </div>
     </>
   );
 };

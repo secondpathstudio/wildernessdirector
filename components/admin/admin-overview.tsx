@@ -38,11 +38,7 @@ export const AdminOverview: FC = (props) => {
                     <div className="text-2xl font-bold">Users</div>
                     <div>
                       {users.map((user: any) => (
-                        <LinkCard key={user.id} href="#">
-                          <CardDescription>
-                            {user.email}
-                          </CardDescription>
-                        </LinkCard>
+                        <p>user.email</p>
                       ))}
                     </div>
                   </div>
