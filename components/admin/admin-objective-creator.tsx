@@ -49,6 +49,16 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
       return;
     }
 
+    if (objective.text === "" || objective.type === "") {
+        toast({
+            title: "Objective not created",
+            description: "Objective text and type are required.",
+        });
+        setIsLoading(false);
+        return;
+    }
+
+
     //get the current objectives array from the topic
     var currentObjectives = topicData.data()?.objectives;
     if (!currentObjectives) {
@@ -80,6 +90,16 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
 
     setIsLoading(false);
   }
+
+    const handleObjectiveDelete = async (index: number) => {
+        var currentObjectives = topicData.data()?.objectives;
+        currentObjectives.splice(index, 1);
+        try {
+            await setDoc(topicDoc, { objectives: currentObjectives }, { merge: true });
+        } catch (error : any) {
+            console.log(error);
+        }
+    }
 
   if (status === "loading") {
     return <div>Loading topic data...</div>;
@@ -124,6 +144,7 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
                           <TableCell>{objective.type}</TableCell>
                           <TableCell>{objective.text}</TableCell>
                           <TableCell>{objective.chapter ? objective.chapter : ""}</TableCell>
+                          <TableCell className="hover:cursor-pointer hover:bg-red-500" onClick={() => handleObjectiveDelete(index)}>Delete</TableCell>
                         </TableRow>
                     ))}
                   </TableBody>
