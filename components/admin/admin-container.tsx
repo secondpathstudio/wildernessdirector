@@ -7,7 +7,7 @@ import { doc } from "firebase/firestore";
 import { AdminOverview } from "./admin-overview";
 import { AdminFieldReports } from "./admin-field-reports";
 import { AdminTopicQuestions } from "./admin-questions";
-import { AdminTopicObjectives } from "./admin-topic-objectives";
+import { AdminTopics } from "./admin-topics";
 
 export const AdminContainer: FC = () => {
     const user = useUser();
@@ -45,7 +45,7 @@ export const AdminContainer: FC = () => {
         </div>
         
         {activeTab === 0 && <AdminOverview topicId={topicId} />}
-        {activeTab === 1 && <AdminTopicObjectives />}
+        {activeTab === 1 && <AdminTopics topicId={topicId} />}
         {activeTab === 2 && <AdminFieldReports />}
         {activeTab === 3 && <AdminTopicQuestions />}
       </div>
