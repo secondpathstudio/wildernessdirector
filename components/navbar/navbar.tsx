@@ -30,7 +30,7 @@ export const NavBar: FC = () => {
                 <Link href="/fellowship" className={buttonVariants({ variant: "link" })}>
                   Fellowship
                 </Link>
-                <Link href="/fellowship" className={buttonVariants({ variant: "link" })}>
+                <Link href="/mobile-app" className={buttonVariants({ variant: "link" })}>
                   App
                 </Link>
               </div>
