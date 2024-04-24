@@ -43,6 +43,11 @@ export const AdminTopics: FC = () => {
     idField: 'id',
   });
 
+  const getMonth = (month: number) => {
+    const months = ['July', 'August', 'September', 'October', 'November', 'December','January', 'February', 'March', 'April', 'May', 'June', ];
+    return months[month];
+  }
+
   return (
     <>
         <div className="flex-1 space-y-4 pt-6">
@@ -72,11 +77,11 @@ export const AdminTopics: FC = () => {
                     :
                     topics.map((topic: any) => (
                         <TableRow key={topic.id}>
-                          <TableCell>{topic.topicNumber}</TableCell>
+                          <TableCell>{getMonth(topic.topicNumber)}</TableCell>
                           <TableCell>
                               <Link href={`/admin/topic?topicId=${topic.id}`}>{topic.topicName}</Link>
                           </TableCell>
-                          <TableCell>{topic.objectives?.length}</TableCell>
+                          <TableCell>{topic.objectiveCount ? topic.objectiveCount : 0}</TableCell>
                         </TableRow>
                     ))}
                   </TableBody>
