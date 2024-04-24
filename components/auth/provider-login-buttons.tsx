@@ -7,7 +7,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { GithubIcon } from "lucide-react";
 import { FC, useState } from "react";
 import { useAuth, useFirestore } from "reactfire";
@@ -28,8 +28,19 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
       // create user in your database here
 
       const user = result.user;
-      if (user?.uid && user.email) {
+      if (user) {
+        //check if user already has entry
+        // if not, create one
+
         try {
+          const userDoc = doc(firestore, `users/${user.uid}`);
+          const userData = await getDoc(userDoc);
+          if (userData.exists()) {
+            //user exists already
+            return;
+          }
+
+          // create user
           await setDoc(doc(firestore, `users/${user.uid}`), {
             email: user.email,
             name: user.displayName || "",
