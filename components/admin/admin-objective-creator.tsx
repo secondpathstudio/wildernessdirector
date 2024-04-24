@@ -9,14 +9,13 @@ import {
   CardDescription,
   LinkCard,
 } from "@/components/ui/card";
-import { DatePicker } from "../ui/datepicker";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { useAuth, useFirestore, useFirestoreDoc } from "reactfire";
+import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc } from "reactfire";
 import { toast } from "../ui/use-toast";
-import { Timestamp, addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { Timestamp, addDoc, collection, deleteDoc, doc, setDoc } from "firebase/firestore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
@@ -28,12 +27,16 @@ interface AdminObjectiveCreatorProps {
 export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => {
   const firestore = useFirestore();
   const topicDoc = doc(firestore, "topics", props.topicId);
+  const topicObjectivesCollection = collection(firestore, "topics", props.topicId, "objectives");
+  const { status: topicObjectivesStatus, data: topicObjectives } = useFirestoreCollection(topicObjectivesCollection);
   const { status, data: topicData } = useFirestoreDoc(topicDoc);
   const [isLoading, setIsLoading] = useState(false);
-  const [objective, setObjective] = useState({
-    text: "",
-    chapter: "",
-    type: "",
+  const [newObjective, setNewObjective] = useState({
+    objectiveText: "",
+    completedBy: [],
+    reference: "",
+    objectiveType: "",
+    topicId: props.topicId,
   })
 
   const auth = useAuth();
@@ -50,7 +53,7 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
       return;
     }
 
-    if (objective.text === "" || objective.type === "") {
+    if (newObjective.objectiveText === "" || newObjective.objectiveType === "") {
         toast({
             title: "Objective not created",
             description: "Objective text and type are required.",
@@ -59,20 +62,19 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
         return;
     }
 
-
-    //get the current objectives array from the topic
-    var currentObjectives = topicData.data()?.objectives;
-    if (!currentObjectives) {
-        //create new array
-        currentObjectives = [];
-    }
-
-    //add the new objective to the array
-    currentObjectives.push({...objective, createdAt: Timestamp.now()});
-
-    //update the topic with the new array
+    //add objective to sub-collection
     try {
-      await setDoc(topicDoc, { objectives: currentObjectives }, { merge: true });
+      const topicObjectivesCollection = collection(firestore, "topics", props.topicId, "objectives");
+      await addDoc(topicObjectivesCollection, {
+        ...newObjective,
+        createdAt: Timestamp.now(),
+      });
+
+      await setDoc(doc(firestore, "topics", props.topicId), {
+        lastUpdated: Timestamp.now(),
+        objectiveCount: topicData.data()?.objectiveCount ? topicData.data()?.objectiveCount + 1 : 1,
+      }, { merge: true });
+      
       toast({
         title: "Objective created",
         description: "Objective added successfully!",
@@ -83,20 +85,25 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
     }
 
     //reset objective
-    setObjective({
-        text: "",
-        chapter: "",
-        type: "",
+    setNewObjective({
+        objectiveText: "",
+        reference: "",
+        completedBy: [],
+        objectiveType: "",
+        topicId: props.topicId,
     });
 
     setIsLoading(false);
   }
 
-    const handleObjectiveDelete = async (index: number) => {
-        var currentObjectives = topicData.data()?.objectives;
-        currentObjectives.splice(index, 1);
+    const handleObjectiveDelete = async (id: string) => {
         try {
-            await setDoc(topicDoc, { objectives: currentObjectives }, { merge: true });
+            const objectiveDoc = doc(firestore, "topics", props.topicId, "objectives", id);
+            await deleteDoc(objectiveDoc);
+            await setDoc(doc(firestore, "topics", props.topicId), {
+                lastUpdated: Timestamp.now(),
+                objectiveCount: topicData.data()?.objectiveCount ? topicData.data()?.objectiveCount - 1 : 0,
+            }, { merge: true });
         } catch (error : any) {
             console.log(error);
         }
@@ -134,39 +141,39 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(topicData.data().objectives === null || topicData.data().objectives === undefined || topicData.data().objectives?.length === 0) ? (
+                    {(topicObjectives === null || topicObjectives === undefined || topicObjectives.docs.length === 0) ? (
                       <TableRow>
                         <TableCell colSpan={3}>No objectives found</TableCell>
                       </TableRow>
                     )
                     :
-                    topicData.data().objectives?.map((objective: any, index: number) => (
+                    topicObjectives.docs.map((topicObjective: any) => (
                       <Dialog>
-                        <TableRow key={index}>
-                          <TableCell>{objective.type}</TableCell>
+                        <TableRow key={topicObjective.id}>
+                          <TableCell>{topicObjective.data().objectiveType}</TableCell>
                           <DialogTrigger>
-                            <TableCell>{objective.text}</TableCell>
+                            <TableCell>{topicObjective.data().objectiveText}</TableCell>
                           </DialogTrigger>
-                          <TableCell>{objective.chapter ? objective.chapter : ""}</TableCell>
+                          <TableCell>{topicObjective.data().reference ? topicObjective.data().reference : ""}</TableCell>
                           {/* <TableCell className="hover:cursor-pointer hover:bg-red-500" onClick={() => handleObjectiveDelete(index)}>Delete</TableCell> */}
                         </TableRow>
                         <DialogContent className="max-h-screen overflow-scroll">
                           <DialogHeader>
                             <DialogTitle>Objective Details</DialogTitle>
-                            <DialogDescription>{objective.text}</DialogDescription>
-                            {objective.chapter && (
+                            <DialogDescription>{topicObjective.data().objectiveText}</DialogDescription>
+                            {topicObjective.data().reference && (
                               <>
-                              <DialogTitle>Reading Chapter</DialogTitle>
-                              <DialogDescription>{objective.chapter}</DialogDescription>
+                              <DialogTitle>Reference</DialogTitle>
+                              <DialogDescription>{topicObjective.data().reference}</DialogDescription>
                               </>
                             )}
                           </DialogHeader>
                             
                           <DialogTitle>Objective Type</DialogTitle>
-                          <DialogDescription>{objective.type}</DialogDescription>
+                          <DialogDescription>{topicObjective.data().objectiveType}</DialogDescription>
                           <DialogFooter>
-                            <Button onClick={() => handleObjectiveDelete(index)}>Delete</Button>
-                            <DialogDescription className="italic text-sm opacity-30">Created on {objective.createdAt.toDate().toLocaleDateString()}</DialogDescription>
+                            <Button onClick={() => handleObjectiveDelete(topicObjective.id)}>Delete</Button>
+                            <DialogDescription className="italic text-sm opacity-30">Created on {topicObjective.data().createdAt.toDate().toLocaleDateString()}</DialogDescription>
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
@@ -186,8 +193,8 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
 
             {/* Type of objective */}
             <Select 
-            onValueChange={(v) => setObjective({...objective, type: v})}
-            value={objective.type}
+            onValueChange={(v) => setNewObjective({...newObjective, objectiveType: v})}
+            value={newObjective.objectiveType}
             >
             <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Objective Type" />
@@ -196,25 +203,22 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
                 <SelectGroup>
                 <SelectItem value="Reading">Reading</SelectItem>
                 <SelectItem value="Skills">Skills</SelectItem>
-                    <SelectItem value="Experience">Experience</SelectItem>
+                <SelectItem value="Experience">Experience</SelectItem>
                 </SelectGroup>
             </SelectContent>
             </Select>
 
-            {/* Chapter of reading */}
-            {objective.type === "Reading" && (
             <Input 
-            placeholder="Chapter" 
-            onChange={(e) => setObjective({...objective, chapter: e.target.value})}
-            value={objective.chapter}
+            placeholder="Reference" 
+            onChange={(e) => setNewObjective({...newObjective, reference: e.target.value})}
+            value={newObjective.reference}
             />
-            )}
 
             {/* objective text */}
             <Textarea 
             placeholder="Objective" 
-            onChange={(e) => setObjective({...objective, text: e.target.value})}
-            value={objective.text}
+            onChange={(e) => setNewObjective({...newObjective, objectiveText: e.target.value})}
+            value={newObjective.objectiveText}
             />
 
             {/* Submit button */}
