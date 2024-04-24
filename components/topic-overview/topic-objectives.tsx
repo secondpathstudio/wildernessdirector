@@ -9,8 +9,8 @@ import {
   CardDescription,
   LinkCard,
 } from "@/components/ui/card";
-import { useAuth, useFirestore, useFirestoreDoc, useFirestoreDocData } from "reactfire";
-import { doc, query } from "firebase/firestore";
+import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc, useFirestoreDocData } from "reactfire";
+import { Timestamp, collection, doc, query, setDoc } from "firebase/firestore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
@@ -24,7 +24,34 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
   const firestore = useFirestore();
   const topicDoc = doc(firestore, "topics", props.topicId);
   const { status, data: topicData } = useFirestoreDoc(topicDoc);
+  const topicObjectivesCollection = collection(firestore, "topics", props.topicId, "objectives");
+  const { status: topicObjectivesStatus, data: topicObjectivesData } = useFirestoreCollection(topicObjectivesCollection);
 
+  const markObjectiveCompleted = async (objectiveId: string) => {
+    const objectiveDoc = doc(firestore, "topics", props.topicId, "objectives", objectiveId);
+
+    if (auth.currentUser === null) {
+      return;
+    }
+
+    var completedByArray: object[] = [];
+    if (topicObjectivesData.docs.length > 0) {
+      completedByArray = topicObjectivesData.docs.find((objective: any) => objective.id === objectiveId)?.data().completedBy;
+      if (completedByArray.find((user: any) => user.userId === auth.currentUser?.uid) !== undefined){
+        return;
+      } else {
+        completedByArray.push({
+          userId: auth.currentUser?.uid,
+          completedAt: Timestamp.now(),
+        });
+      }
+    }
+
+    await setDoc(objectiveDoc, {
+      lastUpdated: Timestamp.now(),
+      completedBy: completedByArray,
+    }, { merge: true });
+  }
 
   return (
     <>
@@ -35,52 +62,65 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                 <CardTitle>Objectives</CardTitle>
               </CardHeader>
               <CardContent className="pl-2">
-                {status === "loading" && <p>Loading objectives...</p>}
-                {status === "error" && <p>Error loading objectives!</p>}
-                {status === "success" && (
+                {topicObjectivesStatus === "loading" && <p>Loading objectives...</p>}
+                {topicObjectivesStatus === "error" && <p>Error loading objectives!</p>}
+                {topicObjectivesStatus === "success" && (
                   <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Objective Type</TableHead>
                       <TableHead>Detail</TableHead>
-                      <TableHead>Chapter</TableHead>
+                      <TableHead>Reference</TableHead>
                       <TableHead>Completed</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(!topicData.data()?.objectives || topicData.data()?.objectives.length === 0) ? (
+                    {(!topicObjectivesData || topicObjectivesData.docs.length === 0) ? (
                       <TableRow>
                         <TableCell colSpan={3}>No objectives found</TableCell>
                       </TableRow>
                     )
                     :
-                    topicData.data()?.objectives.map((objective: any, index: number) => (
+                    topicObjectivesData.docs.map((objective: any) => (
                       <Dialog>
-                      <TableRow key={index}>
-                        <TableCell>{objective.type}</TableCell>
+                      <TableRow key={objective.id}>
+                        <TableCell>{objective.data().objectiveType}</TableCell>
                         <DialogTrigger>
-                          <TableCell>{objective.text}</TableCell>
+                          <TableCell>{objective.data().objectiveText}</TableCell>
                         </DialogTrigger>
-                        <TableCell>{objective.chapter ? objective.chapter : ""}</TableCell>
-                        {/* <TableCell className="hover:cursor-pointer hover:bg-red-500" onClick={() => handleObjectiveDelete(index)}>Delete</TableCell> */}
+                        <TableCell>{objective.data().reference ? objective.data().reference : ""}</TableCell>
+                        <TableCell className="text-2xl">
+                          {
+                            objective.data().completedBy.find((user:any) => user.userId === auth.currentUser?.uid) !== undefined ? (
+                              <span>✅</span>
+                            ) : (
+                              <span></span>
+                            )
+                          }
+                        </TableCell>
                       </TableRow>
                       <DialogContent className="max-h-screen overflow-scroll">
                         <DialogHeader>
                           <DialogTitle>Objective Details</DialogTitle>
-                          <DialogDescription>{objective.text}</DialogDescription>
-                          {objective.chapter && (
+                          <DialogDescription>{objective.data().objectiveText}</DialogDescription>
+                          {objective.data().reference && (
                             <>
                             <DialogTitle>Reading Chapter</DialogTitle>
-                            <DialogDescription>{objective.chapter}</DialogDescription>
+                            <DialogDescription>{objective.data().reference}</DialogDescription>
                             </>
                           )}
                         </DialogHeader>
                           
                         <DialogTitle>Objective Type</DialogTitle>
-                        <DialogDescription>{objective.type}</DialogDescription>
+                        <DialogDescription>{objective.data().objectiveType}</DialogDescription>
                         <DialogFooter>
-                          <Button>Mark as Complete</Button>
-                          <DialogDescription className="italic text-sm opacity-30">Created on {objective.createdAt.toDate().toLocaleDateString()}</DialogDescription>
+                        {objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid) ? (
+                            <DialogDescription className="italic text-sm font-bold text-primary">
+                              Completed on {objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid).completedAt.toDate().toLocaleDateString()} ✅
+                            </DialogDescription>
+                          ) : (
+                            <Button onClick={() => markObjectiveCompleted(objective.id)}>Mark as Complete</Button>
+                          )}
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
