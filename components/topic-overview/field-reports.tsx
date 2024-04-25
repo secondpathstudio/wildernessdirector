@@ -32,6 +32,8 @@ import { collection, deleteDoc, doc, orderBy, query, where } from "firebase/fire
 import { FieldReportCreator } from "./field-report-creator";
 import { FieldReport, FieldReportEditor } from "./field-report-editor";
 import { Button } from "../ui/button";
+import { Camera, Check } from "lucide-react";
+import Image from "next/image";
 
 //create props to accept topicId string
 interface FieldReportsProps {
@@ -84,6 +86,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                       <TableHead className="">Date</TableHead>
                       <TableHead>Report Title</TableHead>
                       <TableHead>Activity</TableHead>
+                      <TableHead><Camera /></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -103,7 +106,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                             </DialogTrigger>
                           </TableCell>
                           <TableCell>{report.activity}</TableCell>
-                          {/* <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleFieldReportDelete(report.id)}>Delete</TableCell> */}
+                          <TableCell>{report.images?.length > 0 ? <Check /> : ""}</TableCell>
                         </TableRow>
                         <DialogContent className="max-h-screen overflow-scroll">
                           <DialogHeader>
@@ -116,6 +119,13 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
 
                           <DialogTitle>Report</DialogTitle>
                           <DialogDescription>{report.reportText}</DialogDescription>
+
+                          {report.images?.length > 0 && (
+                            <>
+                              <DialogTitle>Images</DialogTitle>
+                                <Image src={report.images[0]} alt="Field Report Image" width={250} height={250} />
+                            </>
+                          )}
                           <DialogClose asChild>
                             <Button type="button" className="mt-2" onClick={() => setEditingFieldReport(report)}>
                                 Edit
