@@ -86,7 +86,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                       <TableHead className="">Date</TableHead>
                       <TableHead>Report Title</TableHead>
                       <TableHead>Activity</TableHead>
-                      <TableHead><Camera /></TableHead>
+                      <TableHead>Image</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -106,7 +106,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                             </DialogTrigger>
                           </TableCell>
                           <TableCell>{report.activity}</TableCell>
-                          <TableCell>{report.images?.length > 0 ? <Check /> : ""}</TableCell>
+                          <TableCell>{report.images?.length > 0 ? <Camera /> : ""}</TableCell>
                         </TableRow>
                         <DialogContent className="max-h-screen overflow-scroll">
                           <DialogHeader>
