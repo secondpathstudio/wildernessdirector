@@ -36,6 +36,7 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
     activity: "",
     activityDate: Timestamp.now().toDate(),
     topicId: props.topicId ? props.topicId : "unknownTopicId",
+    images: [] as string[],
   })
 
   const auth = useAuth();
@@ -77,9 +78,14 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
       activity: "",
       activityDate: Timestamp.now().toDate(),
       topicId: props.topicId ? props.topicId : "unknownTopicId",
+      images: [] as string[],
     });
 
     setIsLoading(false);
+  }
+
+  const handleAddImageToReport = (url: string) => {
+    setFieldReport({...fieldReport, images: [...fieldReport.images, url]});
   }
 
 
@@ -131,7 +137,7 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
           />
 
         <div>
-        <ImageUploader />
+        <ImageUploader addImageToReport={handleAddImageToReport}/>
         </div>
 
         {/* Submit button */}

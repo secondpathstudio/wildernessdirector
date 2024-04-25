@@ -19,14 +19,12 @@ import {
 import { Button } from "./button";
 import { Input } from "./input";
 import Image from "next/image";
-import Link from "next/link";
 
 import RadialProgress from "./radial-progress";
 import { Upload, UploadCloud } from "lucide-react";
 
-export default function ImageUploader() {
+export default function ImageUploader(props: any) {
   const auth = useAuth();
-  const firebaseApp = useFirebaseApp();
   const storage = useStorage();
   const [loading, setLoading] = useState<boolean>(false);
   const [progress, setProgress] = useState(0);
@@ -83,6 +81,12 @@ export default function ImageUploader() {
       console.error("Error uploading file", error);
     }
     setLoading(false);
+  };
+
+  const handleAddImageToReport = () => {
+    if (uploadedImagePath) {
+      
+    }
   };
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -178,18 +182,18 @@ export default function ImageUploader() {
               type="button"
               variant="secondary"
             >
-              Close
+              Cancel
             </Button>
           </DialogClose>
 
           <DialogClose asChild>
             <Button
-              // onClick={}
+              onClick={() => props.addImageToReport(uploadedImagePath)}
               disabled={!selectedImage || loading}
               size={"sm"}
               className=" text-sm"
             >
-              {loading ? "Uploading..." : "Submit"}
+              {loading ? "Uploading..." : "Confirm"}
             </Button>
           </DialogClose>
         </DialogFooter>
