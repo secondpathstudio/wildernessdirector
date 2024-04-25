@@ -22,6 +22,7 @@ import Image from "next/image";
 
 import RadialProgress from "./radial-progress";
 import { Upload, UploadCloud } from "lucide-react";
+import { Progress } from "./progress";
 
 export default function ImageUploader(props: any) {
   const auth = useAuth();
@@ -38,6 +39,7 @@ export default function ImageUploader(props: any) {
     const percentage = Math.round(
       (progressEvent.bytesTransferred / progressEvent.totalBytes) * 100
     );
+    console.log(percentage);
     setProgress(percentage);
   };
 
@@ -118,7 +120,7 @@ export default function ImageUploader(props: any) {
             >
               {loading && (
                 <div className=" text-center max-w-md  ">
-                  <RadialProgress progress={progress} />
+                  <Progress value={progress} />
                   <p className=" text-sm font-semibold">Uploading Picture</p>
                   <p className=" text-xs text-gray-400">
                     Do not refresh or perform any other action while the picture
