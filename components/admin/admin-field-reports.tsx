@@ -29,6 +29,7 @@ import {
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, deleteDoc, doc, orderBy, query, where } from "firebase/firestore";
 import { Camera } from "lucide-react";
+import Image from "next/image";
 
 //create props to accept topicId string
 interface AdminFieldReportsProps {
@@ -115,6 +116,13 @@ export const AdminFieldReports: FC<AdminFieldReportsProps> = (props) => {
 
                           <DialogTitle>Report</DialogTitle>
                           <DialogDescription>{report.reportText}</DialogDescription>
+                          
+                          {report.images?.length > 0 && (
+                            <div>
+                              <DialogTitle>Image</DialogTitle>
+                              <Image src={report.images[0]} alt="Field Report Image" width={250} height={250} />
+                            </div>
+                          )}
                           <DialogFooter>
                             <DialogDescription className="italic text-sm opacity-30">Created on {report.createdAt.toDate().toLocaleDateString()}</DialogDescription>
                           </DialogFooter>
