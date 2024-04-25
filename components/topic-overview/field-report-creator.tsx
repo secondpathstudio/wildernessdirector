@@ -20,6 +20,7 @@ import { Button } from "../ui/button";
 import { useAuth, useFirestore } from "reactfire";
 import { toast } from "../ui/use-toast";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
+import ImageUploader from "../ui/image-uploader";
 
 interface FieldReportCreatorProps {
     topicId: string;
@@ -128,6 +129,10 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
           onChange={(e) => setFieldReport({...fieldReport, reportText: e.target.value})}
           value={fieldReport.reportText}
           />
+
+        <div>
+        <ImageUploader />
+        </div>
 
         {/* Submit button */}
         <Button>Create Report</Button>

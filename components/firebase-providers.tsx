@@ -6,6 +6,7 @@ import {
   AuthProvider,
   FirebaseAppProvider,
   FirestoreProvider,
+  StorageProvider,
   useFirebaseApp,
 } from "reactfire";
 import { getAuth } from "firebase/auth";
@@ -13,6 +14,7 @@ import { getFirestore } from "firebase/firestore";
 import { isBrowser } from "@/lib/utils";
 import { getAnalytics } from "firebase/analytics";
 import { FirebaseOptions } from "firebase/app";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBNsAaANv4Fp2yuOtKK3QuwLTqc5E_zIb8",
@@ -29,6 +31,7 @@ const FirebaseProviderSDKs: FC<{ children: ReactNode }> = ({ children }) => {
   // we have to use getters to pass to providers, children should use hooks
   const auth = useMemo(() => getAuth(), []);
   const firestore = useMemo(() => getFirestore(firebase), []);
+  const storage = useMemo(() => getStorage(firebase), []);
   const analytics = useMemo(() => isBrowser() && getAnalytics(firebase), []);
 
   return (
@@ -36,12 +39,14 @@ const FirebaseProviderSDKs: FC<{ children: ReactNode }> = ({ children }) => {
       {auth && (
         <AuthProvider sdk={auth}>
           <FirestoreProvider sdk={firestore}>
+            <StorageProvider sdk={storage}>
             {/* we can only use analytics in the browser */}
             {analytics ? (
               <AnalyticsProvider sdk={analytics}>{children}</AnalyticsProvider>
             ) : (
               <>{children}</>
             )}
+            </StorageProvider>
           </FirestoreProvider>
         </AuthProvider>
       )}
