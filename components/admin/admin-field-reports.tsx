@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dialog"
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, deleteDoc, doc, orderBy, query, where } from "firebase/firestore";
+import { Camera } from "lucide-react";
 
 //create props to accept topicId string
 interface AdminFieldReportsProps {
@@ -78,6 +79,7 @@ export const AdminFieldReports: FC<AdminFieldReportsProps> = (props) => {
                       <TableHead>Author</TableHead>
                       <TableHead>Report Title</TableHead>
                       <TableHead>Activity</TableHead>
+                      <TableHead>Image</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -99,6 +101,7 @@ export const AdminFieldReports: FC<AdminFieldReportsProps> = (props) => {
                             </DialogTrigger>
                           </TableCell>
                           <TableCell>{report.activity}</TableCell>
+                          <TableCell>{report.images?.length > 0 ? <Camera /> : ""}</TableCell>
                           <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleFieldReportDelete(report.id)}>Delete</TableCell>
                         </TableRow>
                         <DialogContent className="max-h-screen overflow-scroll">
