@@ -70,7 +70,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
     <>
         <div className="flex-1 space-y-4 pt-6">
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-3">
+            <Card className="col-span-4">
               <CardHeader>
                 <CardTitle>Field Reports</CardTitle>
               </CardHeader>
