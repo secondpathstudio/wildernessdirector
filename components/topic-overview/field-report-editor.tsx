@@ -20,6 +20,9 @@ import { Button } from "../ui/button";
 import { useAuth, useFirestore } from "reactfire";
 import { toast } from "../ui/use-toast";
 import { Timestamp, addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import ImageUploader from "../ui/image-uploader";
+import Image from "next/image";
+import { Trash } from "lucide-react";
 
 export type FieldReport = {
   id: string | null,
@@ -27,6 +30,7 @@ export type FieldReport = {
   reportTitle: string,
   activity: string,
   activityDate: Timestamp,
+  images: string[],
 }
 
 interface FieldReportEditorProps {
@@ -83,6 +87,9 @@ export const FieldReportEditor: FC<FieldReportEditorProps> = (props) => {
     setIsLoading(false);
   }
 
+  const handleAddImageToReport = (url: string) => {
+    setFieldReport({...fieldReport, images: [...fieldReport.images, url]});
+  }
 
   return (
     <Card className="col-span-3">
@@ -130,6 +137,22 @@ export const FieldReportEditor: FC<FieldReportEditorProps> = (props) => {
           onChange={(e) => setFieldReport({...fieldReport, reportText: e.target.value})}
           value={fieldReport.reportText}
           />
+
+        <div>
+          {fieldReport.images.length > 0 ? (
+            <div>
+              <h2>Image</h2>
+              <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Image src={fieldReport.images[0]} alt="field report image" height={250} width={250}/>
+                    <Button variant="destructive" className="mt-2" onClick={() => setFieldReport({...fieldReport, images: []})}><Trash />Remove Image</Button>
+                  </div>
+              </div>
+            </div>
+          ) : 
+            <ImageUploader addImageToReport={handleAddImageToReport}/>
+          }
+        </div>
 
         {/* Submit button */}
         <Button>Update Report</Button>

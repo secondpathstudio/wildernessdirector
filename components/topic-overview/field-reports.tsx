@@ -122,7 +122,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
 
                           {report.images?.length > 0 && (
                             <>
-                              <DialogTitle>Images</DialogTitle>
+                              <DialogTitle>Image</DialogTitle>
                                 <Image src={report.images[0]} alt="Field Report Image" width={250} height={250} />
                             </>
                           )}
