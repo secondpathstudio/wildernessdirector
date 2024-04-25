@@ -47,14 +47,13 @@ export const SignUpForm: FC<SignUpFormProps> = ({ onShowLogin, onSignUp }) => {
   const signup = async ({ email, password }: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
-      const user = await createUserWithEmailAndPassword(auth, email, password);
-      if (user?.user.uid && user.user.email) {
-        // create user in firestore here if you want
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      if (result?.user.uid && result.user.email) {
         try {
-          await setDoc(doc(firestore, `users/${user.user.uid}`), {
-            email: user.user.email,
+          await setDoc(doc(firestore, `users/${result.user.uid}`), {
+            email: result.user.email,
             createdAt: Timestamp.now(),
-            name: user.user.displayName || "",
+            name: result.user.displayName || "",
             isAdmin: false,
           });
         } catch (err) {

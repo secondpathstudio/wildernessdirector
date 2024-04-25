@@ -114,13 +114,24 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                         <DialogTitle>Objective Type</DialogTitle>
                         <DialogDescription>{objective.data().objectiveType}</DialogDescription>
                         <DialogFooter>
-                        {objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid) ? (
+                        {(objective.data().objectiveType === "Reading" && objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid)) && (
                             <DialogDescription className="italic text-sm font-bold text-primary">
                               Completed on {objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid).completedAt.toDate().toLocaleDateString()} ✅
                             </DialogDescription>
-                          ) : (
-                            <Button onClick={() => markObjectiveCompleted(objective.id)}>Mark as Complete</Button>
-                          )}
+                        )}
+                        {(objective.data().objectiveType === "Reading" && !objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid)) && (
+                          <Button onClick={() => markObjectiveCompleted(objective.id)}>Mark as Completed</Button>
+                        )}
+                        {objective.data().objectiveType === "Skills" && objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid) && (
+                            <DialogDescription className="italic text-sm font-bold text-primary">
+                              Completed on {objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid).completedAt.toDate().toLocaleDateString()} ✅
+                            </DialogDescription>
+                        )}
+                        {objective.data().objectiveType === "Skills" && !objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid) && (
+                            <DialogDescription className="italic text-sm text-primary">
+                              Requires sign off by fellowship director.
+                            </DialogDescription>
+                        )}
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>

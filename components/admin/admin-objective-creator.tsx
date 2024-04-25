@@ -203,7 +203,6 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
                 <SelectGroup>
                 <SelectItem value="Reading">Reading</SelectItem>
                 <SelectItem value="Skills">Skills</SelectItem>
-                <SelectItem value="Experience">Experience</SelectItem>
                 </SelectGroup>
             </SelectContent>
             </Select>

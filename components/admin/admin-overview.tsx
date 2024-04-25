@@ -8,18 +8,18 @@ import {
   CardDescription,
   LinkCard,
 } from "@/components/ui/card";
-import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
-import { collection, query, where } from "firebase/firestore";
+import { useAuth, useFirestore, useFirestoreCollectionData, useFirestoreDoc } from "reactfire";
+import { collection, doc, query, where } from "firebase/firestore";
+import Link from "next/link";
 
+interface AdminOverviewProps {
+  userId: string | undefined;
+  users: any;
+}
 
-export const AdminOverview: FC = (props) => {
+export const AdminOverview: FC<AdminOverviewProps> = (props) => {
   const auth = useAuth();
-  const firestore = useFirestore();
-  const usersCollection = collection(firestore, "users");
-  const usersQuery = query(usersCollection, where('isAdmin', '==', false));
-  const { status: usersStatus, data: users } = useFirestoreCollectionData(usersQuery, {
-    idField: 'id',
-  });
+  
 
   return (
     <>
@@ -30,18 +30,11 @@ export const AdminOverview: FC = (props) => {
                 <CardTitle>Users Overview</CardTitle>
               </CardHeader>
               <CardContent className="pl-2">
-                {usersStatus === "loading" && (
-                  <div className="text-2xl font-bold">Loading users...</div>
-                )}
-                {usersStatus === "success" && (
-                  <div>
-                    <div className="text-2xl font-bold">Users</div>
-                    <div>
-                      {users.map((user: any) => (
-                        <p>user.email</p>
-                      ))}
-                    </div>
-                  </div>
+                {props.users?.find((user: any) => user.id === props.userId) && (
+                    <CardDescription>
+                      <p>{props.users?.find((user: any) => user.id === props.userId).data().name}</p>
+                      <p>{props.users?.find((user: any) => user.id === props.userId).data().email}</p>
+                    </CardDescription> 
                 )}
               </CardContent>
             </Card>
