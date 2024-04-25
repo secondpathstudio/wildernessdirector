@@ -36,7 +36,7 @@ export default function ImageUploader(props: any) {
 
   const onUploadProgress = (progressEvent: any) => {
     const percentage = Math.round(
-      (progressEvent.loaded * 100) / progressEvent.total
+      (progressEvent.bytesTransferred / progressEvent.totalBytes) * 100
     );
     setProgress(percentage);
   };
@@ -67,7 +67,9 @@ export default function ImageUploader(props: any) {
     try {
       const uploadTask = uploadBytesResumable(storageRef, fileToUpload);
 
-      uploadTask.on("state_changed", onUploadProgress);
+      uploadTask.on("state_changed", (snapshot) => {
+        onUploadProgress(snapshot);
+      });
 
       uploadTask.then((snapshot) => {
         console.log("Uploaded a blob or file!", snapshot);
@@ -75,17 +77,12 @@ export default function ImageUploader(props: any) {
           setUploadedImagePath(downloadURL);
         });
         setUploadTask(undefined);
+        setLoading(false);
       });
       setUploadTask(uploadTask);
     } catch (error) {
       console.error("Error uploading file", error);
-    }
-    setLoading(false);
-  };
-
-  const handleAddImageToReport = () => {
-    if (uploadedImagePath) {
-      
+      setLoading(false);
     }
   };
 
@@ -188,7 +185,11 @@ export default function ImageUploader(props: any) {
 
           <DialogClose asChild>
             <Button
-              onClick={() => props.addImageToReport(uploadedImagePath)}
+              onClick={() => {
+                props.addImageToReport(uploadedImagePath)
+                setUploadedImagePath(null)
+                setSelectedImage(null)
+              }}
               disabled={!selectedImage || loading}
               size={"sm"}
               className=" text-sm"
