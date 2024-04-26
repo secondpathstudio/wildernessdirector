@@ -1,5 +1,5 @@
 'use client';
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { getDocs, collection, query, orderBy, doc } from "firebase/firestore";
 import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc } from "reactfire";
 import {
@@ -28,6 +28,23 @@ export const Dashboard: FC = () => {
   const { status: userStatus, data: userData } = useFirestoreDoc(userDoc, {
     idField: 'id'
   });
+  
+  useEffect(() => {
+    //calculate current topic
+    var topicToSet = 0;
+    if (status === 'success' && topics.docs.length > 0) {
+      topics.docs.forEach((topic, i) => {
+        const userProgress = topic.data().userProgress?.find((user: any) => user.userId === auth.currentUser?.uid);
+        if (userProgress !== undefined) {
+          if (userProgress.completedObjectives / topic.data().objectiveCount >= 1) {
+            topicToSet = i + 1;
+          }
+        }
+      });
+      setCurrentTopic(topicToSet);
+      console.log('current topic', topicToSet);
+    }
+  }, [topics]);
 
   
 
@@ -61,11 +78,18 @@ export const Dashboard: FC = () => {
         <div className="flex">
           <div>
             {topics && topics.docs.map((topic,i) => {
-              var isLocked = topic.data().topicNumber !== 0;
+              var isLocked = topic.data().topicNumber > currentTopic;
               var progress = 0;
               
               //check user progress on topic
-              
+              const userProgress = topic.data().userProgress?.find((user: any) => user.userId === auth.currentUser?.uid);
+              if (userProgress !== undefined) {
+                progress = Math.round((userProgress.completedObjectives / topic.data().objectiveCount) * 100);
+
+                if (progress >= 100) {
+                  isLocked = false;
+                }
+              }
 
 
               return (
@@ -76,7 +100,7 @@ export const Dashboard: FC = () => {
                   index={i}
                   totalCount={11}
                   locked={isLocked} 
-                  current={topic.data().topicNumber === 0}
+                  current={currentTopic === i}
                   percentage={progress}
                 />
               )
