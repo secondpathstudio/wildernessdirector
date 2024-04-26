@@ -12,3 +12,5 @@ const AdminTopicPage = () => {
   );
 };
 export default AdminTopicPage;
+
+//TODO  REMOVE THIS PAGE
