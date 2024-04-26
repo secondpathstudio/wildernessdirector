@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { TopicButton } from "../ui/topic-button";
-import { TopicBanner } from "../ui/topic-banner";
 import { Button } from "../ui/button";
 
 export const Dashboard: FC = () => {
