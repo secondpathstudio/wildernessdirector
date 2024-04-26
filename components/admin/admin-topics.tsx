@@ -27,9 +27,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
+import { useAuth, useFirestore, useFirestoreCollection, useFirestoreCollectionData } from "reactfire";
 import { collection, orderBy, query, where } from "firebase/firestore";
 import Link from "next/link";
+import { AdminObjectiveCreator } from "./admin-objective-creator";
 
 export const AdminTopics: FC = () => {
   const auth = useAuth();
@@ -42,6 +43,10 @@ export const AdminTopics: FC = () => {
   const { status, data: topics } = useFirestoreCollectionData(topicsQuery, {
     idField: 'id',
   });
+  const objectivesCollection = collection(firestore, `topics/${currentTopic?.id}/objectives`);
+  const { status: objectivesStatus, data: objectives } = useFirestoreCollection(objectivesCollection, {
+    idField: 'id',
+  });
 
   const getMonth = (month: number) => {
     const months = ['July', 'August', 'September', 'October', 'November', 'December','January', 'February', 'March', 'April', 'May', 'June', ];
@@ -52,7 +57,12 @@ export const AdminTopics: FC = () => {
     <>
         <div className="flex-1 space-y-4 pt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
+            {currentTopic && (
+              <AdminObjectiveCreator topicId={currentTopic?.id} setCurrentTopic={setCurrentTopic}/>
+            )}
+
+            {!currentTopic && (
+              <Card className="col-span-7">
               <CardHeader>
                 <CardTitle>Topics</CardTitle>
               </CardHeader>
@@ -79,7 +89,7 @@ export const AdminTopics: FC = () => {
                         <TableRow key={topic.id}>
                           <TableCell>{getMonth(topic.topicNumber)}</TableCell>
                           <TableCell>
-                              <Link href={`/admin/topic?topicId=${topic.id}`}>{topic.topicName}</Link>
+                              <button onClick={() => setCurrentTopic(topic)}>{topic.topicName}</button>
                           </TableCell>
                           <TableCell>{topic.objectiveCount ? topic.objectiveCount : 0}</TableCell>
                         </TableRow>
@@ -89,7 +99,7 @@ export const AdminTopics: FC = () => {
                 )}
               </CardContent>
             </Card>
-            
+            )}           
           </div>
         </div>
     </>

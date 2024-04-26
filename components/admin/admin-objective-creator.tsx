@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 
 interface AdminObjectiveCreatorProps {
     topicId: string;
+    setCurrentTopic: (topic: any) => void;
 }
 
 export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => {
@@ -125,9 +126,7 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
     return (
     <>
         <Card className="col-span-4">
-                <Link href="/admin">
-                    <Button>Back</Button>
-                </Link>
+              <Button className="m-2" variant={"destructive"} onClick={() => props.setCurrentTopic(null)}>Back</Button>
               <CardHeader>
                 <CardTitle>Objectives for {topicData.data().topicName}</CardTitle>
               </CardHeader>
