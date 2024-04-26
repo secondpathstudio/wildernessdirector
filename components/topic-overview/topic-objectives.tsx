@@ -54,6 +54,24 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
     }, { merge: true });
 
     //TODO track user progress for main dashboard progress
+    var topicProgress = topicData?.data()?.userProgress;
+    if (topicProgress === undefined) {
+      topicProgress = [];
+    }
+    if (topicProgress.find((user: any) => user.userId === auth.currentUser?.uid) !== undefined){
+      //update user progress by 1
+      topicProgress.find((user: any) => user.userId === auth.currentUser?.uid).completedObjectives += 1;
+      topicProgress.find((user: any) => user.userId === auth.currentUser?.uid).lastUpdated = Timestamp.now();
+    } else {
+      topicProgress.push({
+        userId: auth.currentUser?.uid,
+        completedAt: Timestamp.now(),
+      });
+    }
+
+    await setDoc(topicDoc, {
+      userProgress: topicProgress,
+    }, { merge: true });
 
   }
 

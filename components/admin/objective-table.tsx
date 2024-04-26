@@ -25,6 +25,7 @@ const ObjectiveTable = (props: Props) => {
             return;
         }
 
+        var markObjectiveCompleted;
         const completedBy = [...objectiveDoc.data().completedBy] || [];
         const userIndex = completedBy.findIndex((entry: any) => entry.userId === props.currentUserId);
         if (userIndex === -1) {
@@ -32,13 +33,52 @@ const ObjectiveTable = (props: Props) => {
                 userId: props.currentUserId,
                 completedAt: Timestamp.now()
             });
+            markObjectiveCompleted = true;
         } else {
             completedBy.splice(userIndex, 1);
+            markObjectiveCompleted = false;
         }
 
         await updateDoc(objectiveRef, {
             completedBy
         });
+
+        //TODO track user progress for main dashboard progress
+        const topicRef = doc(firestore, `topics/${props.currentTopicId}`);
+        const topicDoc = await getDoc(topicRef);
+
+        if (!topicDoc.exists()) {
+            console.log('Could not find topic document for ID: ', props.currentTopicId);
+            return;
+        }
+
+        var topicProgress = topicDoc?.data()?.userProgress;
+        if (topicProgress === undefined) {
+            topicProgress = [];
+        }
+
+        if (topicProgress.find((user: any) => user.userId === props.currentUserId) !== undefined){
+            //found user entry - update user progress
+            if (markObjectiveCompleted) {
+                topicProgress.find((user: any) => user.userId === props.currentUserId).completedObjectives += 1;
+            } else {
+                topicProgress.find((user: any) => user.userId === props.currentUserId).completedObjectives -= 1;
+            }
+            
+            topicProgress.find((user: any) => user.userId === props.currentUserId).lastUpdated = Timestamp.now();
+        } else {
+            //new user entry - add user progress
+            topicProgress.push({
+                userId: props.currentUserId,
+                completedObjectives: markObjectiveCompleted ? 1 : 0,
+                lastUpdated: Timestamp.now(),
+            });
+        }
+
+        await setDoc(topicRef, {
+        userProgress: topicProgress,
+        }, { merge: true });
+
     }
 
     if (status === 'loading') {
