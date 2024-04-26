@@ -65,7 +65,7 @@ export const AdminUserOverview: FC<AdminUserOverviewProps> = (props) => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-7">
               <CardHeader>
-                <div className="flex">
+                <div className="flex items-center">
                 <CardTitle>Month: </CardTitle>
                 {status === "loading" && <p>Loading data...</p>}
                 {status === "error" && <p>Error loading data!</p>}
