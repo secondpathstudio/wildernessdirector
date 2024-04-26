@@ -34,7 +34,7 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
       return;
     }
 
-    //update objective data
+    //update objective document
     var completedByArray: object[] = [];
     if (topicObjectivesData.docs.length > 0) {
       completedByArray = topicObjectivesData.docs.find((objective: any) => objective.id === objectiveId)?.data().completedBy;
@@ -53,31 +53,8 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
       completedBy: completedByArray,
     }, { merge: true });
 
-    //update topic data
-    var topicUserProgress: any[] = topicData.data()?.userProgress ? topicData.data()?.userProgress : [];
-    const userIndex = topicUserProgress.findIndex((user: any) => user.userId === auth.currentUser?.uid);
-    if (userIndex !== -1) {
-      //user already exists in the array
-      const currentObjectiveCount = topicUserProgress[userIndex].objectivesCompleted;
+    //TODO track user progress for main dashboard progress
 
-      topicUserProgress[userIndex] = {
-        userId: auth.currentUser?.uid,
-        objectivesCompleted: currentObjectiveCount + 1,
-        lastUpdated: Timestamp.now(),
-      };
-    } else {
-      //user does not exist in the array
-      topicUserProgress.push({
-        userId: auth.currentUser?.uid,
-        objectivesCompleted: 1,
-        lastUpdated: Timestamp.now(),
-      });
-    }
-
-    await setDoc(topicDoc, {
-      lastUpdated: Timestamp.now(),
-      userProgress: topicUserProgress,
-    }, { merge: true });
   }
 
   return (

@@ -66,38 +66,20 @@ export const Dashboard: FC = () => {
               var progress = 0;
               
               //check user progress on topic
-              if (topic.data().userProgress) {
-                const userProgressIndex = topic.data().userProgress.findIndex((user: any) => user.userId === auth.currentUser?.uid);
-                progress = topic.data().userProgress[userProgressIndex].objectivesCompleted / topic.data().objectiveCount * 100
-
-                if (progress >= 100) {
-                  isLocked = false;
-                  setCurrentTopic(i + 1);
-                }
-
-              }
+              
 
 
               return (
-                <>
-                  {/* <TopicBanner 
-                    title={topic.data().topicName}
-                    description={topic.data().chapters}
-                  /> */}
-
-                    {/* <div className="bg-primary h-5 w-5">
-                    </div> */}
-                    <TopicButton
-                      topicName={topic.data().topicName}
-                      key={topic.id}
-                      id={topic.id}
-                      index={i}
-                      totalCount={11}
-                      locked={isLocked} 
-                      current={topic.data().topicNumber === currentTopic}
-                      percentage={progress}
-                    />
-                </>
+                <TopicButton
+                  topicName={topic.data().topicName}
+                  key={topic.id}
+                  id={topic.id}
+                  index={i}
+                  totalCount={11}
+                  locked={isLocked} 
+                  current={topic.data().topicNumber === 0}
+                  percentage={progress}
+                />
               )
             })}
             </div>

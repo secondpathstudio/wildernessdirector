@@ -1,7 +1,7 @@
 import React from 'react'
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../ui/table';
 import { useFirestore, useFirestoreCollection, useFirestoreDoc, useFirestoreDocData, useFirestoreDocDataOnce } from 'reactfire';
-import { Timestamp, collection, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { Timestamp, collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { stat } from 'fs';
 
 type Props = {
