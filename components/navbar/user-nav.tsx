@@ -14,10 +14,10 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { getAuth, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { useUser } from "reactfire";
+import { useFirestore, useFirestoreDoc, useUser } from "reactfire";
 
 export function UserNav() {
-  const { data } = useUser();
+  const { data: userAuth } = useUser(); 
   const router = useRouter();
   const doLogout = async () => {
     await signOut(getAuth());
@@ -33,11 +33,11 @@ export function UserNav() {
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-10 w-10">
             <AvatarImage
-              src={data?.photoURL || "/avatars/04.png"}
+              src={userAuth?.photoURL || "/avatars/04.png"}
               alt="@shadcn"
             />
             <AvatarFallback>
-              {data?.displayName?.slice(0, 2) || data?.email?.slice(0, 2) || ""}
+              {userAuth?.displayName?.slice(0, 2) || userAuth?.email?.slice(0, 2) || ""}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -46,17 +46,18 @@ export function UserNav() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {data?.displayName ||
-                data?.email?.slice(0, data?.email?.indexOf("@")) ||
+              {userAuth?.displayName ||
+                userAuth?.email?.slice(0, userAuth?.email?.indexOf("@")) ||
                 "Anonymous"}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {data?.email || "No email"}
+              {userAuth?.email || "No email"}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          {}
           {/* <DropdownMenuItem>Settings</DropdownMenuItem> */}
           {/* <DropdownMenuItem>Billing</DropdownMenuItem>
           <DropdownMenuItem>Profile</DropdownMenuItem>
