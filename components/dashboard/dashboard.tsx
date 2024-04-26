@@ -1,7 +1,7 @@
 'use client';
 import { FC, useState } from "react";
-import { getDocs, collection, query, orderBy } from "firebase/firestore";
-import { useAuth, useFirestore, useFirestoreCollection } from "reactfire";
+import { getDocs, collection, query, orderBy, doc } from "firebase/firestore";
+import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc } from "reactfire";
 import {
   Card,
   CardHeader,
@@ -16,12 +16,17 @@ import { TopicBanner } from "../ui/topic-banner";
 import { Button } from "../ui/button";
 
 export const Dashboard: FC = () => {
+  const [currentTopic, setCurrentTopic] = useState(0);
   const firestore = useFirestore();
   const auth = useAuth();
   const topicsCollection = collection(firestore, "topics");
   const [isAscending, setIsAscending] = useState(true);
   const topicsQuery = query(topicsCollection, orderBy('topicNumber', isAscending ? 'asc' : 'desc'));
   const { status, data: topics } = useFirestoreCollection(topicsQuery, {
+    idField: 'id'
+  });
+  const userDoc = doc(firestore, `users/${auth.currentUser?.uid}`)
+  const { status: userStatus, data: userData } = useFirestoreDoc(userDoc, {
     idField: 'id'
   });
 
@@ -57,8 +62,21 @@ export const Dashboard: FC = () => {
         <div className="flex">
           <div>
             {topics && topics.docs.map((topic,i) => {
-              const isCurrent = topic.data().topicNumber === 0;
-              const isLocked = !topic.data().isCompleted && !isCurrent;
+              var isLocked = topic.data().topicNumber !== 0;
+              var progress = 0;
+              
+              //check user progress on topic
+              if (topic.data().userProgress) {
+                const userProgressIndex = topic.data().userProgress.findIndex((user: any) => user.userId === auth.currentUser?.uid);
+                progress = topic.data().userProgress[userProgressIndex].objectivesCompleted / topic.data().objectiveCount * 100
+
+                if (progress >= 100) {
+                  isLocked = false;
+                  setCurrentTopic(i + 1);
+                }
+
+              }
+
 
               return (
                 <>
@@ -76,8 +94,8 @@ export const Dashboard: FC = () => {
                       index={i}
                       totalCount={11}
                       locked={isLocked} 
-                      current={isCurrent}
-                      percentage={0}
+                      current={topic.data().topicNumber === currentTopic}
+                      percentage={progress}
                     />
                 </>
               )
