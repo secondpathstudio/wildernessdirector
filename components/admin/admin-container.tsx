@@ -8,6 +8,10 @@ import { AdminTopicQuestions } from "./admin-questions";
 import { AdminTopics } from "./admin-topics";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { collection, query, where } from "firebase/firestore";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "../ui/dialog";
+import { UserPlus } from "lucide-react";
+import { Button } from "../ui/button";
+import AddUserForm from "./add-user-form";
 
 export const AdminContainer: FC = () => {
     const user = useUser();
@@ -56,6 +60,14 @@ export const AdminContainer: FC = () => {
             </SelectContent>
             </Select>
           )}
+          <Dialog>
+            <DialogTrigger>
+              <Button><UserPlus /></Button>
+            </DialogTrigger>
+            <DialogContent>
+                <AddUserForm />
+              </DialogContent>
+          </Dialog>
           </div>
         </div>
         
