@@ -82,21 +82,6 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
         </svg>
         Google
       </Button>
-      {/* <Button
-        className="w-60 mt-4"
-        disabled={isLoading}
-        onClick={async () => {
-          const provider = new GithubAuthProvider();
-          toast({
-            title: "Oops!",
-            description: "Provider not configured, yet.",
-          });
-          // await doProviderSignIn(provider);
-        }}
-      >
-        <GithubIcon className="w-4 h-4 mr-2" />
-        Github
-      </Button> */}
     </>
   );
 };
