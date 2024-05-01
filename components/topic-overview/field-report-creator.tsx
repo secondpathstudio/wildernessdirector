@@ -9,9 +9,7 @@ import {
   CardDescription,
   LinkCard,
 } from "@/components/ui/card";
-import { CreateMCQuestionForm }  from "./create-mc-question-form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { CreateTFQuestionForm } from "./create-tf-question-form";
+import Image from "next/image";
 import { DatePicker } from "../ui/datepicker";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 import { Input } from "../ui/input";
@@ -21,6 +19,7 @@ import { useAuth, useFirestore } from "reactfire";
 import { toast } from "../ui/use-toast";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
 import ImageUploader from "../ui/image-uploader";
+import { Trash } from "lucide-react";
 
 interface FieldReportCreatorProps {
     topicId: string;
@@ -136,8 +135,20 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
           value={fieldReport.reportText}
           />
 
-        <div>
-        <ImageUploader addImageToReport={handleAddImageToReport}/>
+          <div>
+            {fieldReport.images.length > 0 ? (
+              <div>
+                <h2>Image</h2>
+                <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Image src={fieldReport.images[0]} alt="field report image" height={250} width={250}/>
+                      <Button variant="destructive" className="mt-2" onClick={() => setFieldReport({...fieldReport, images: []})}><Trash />Remove Image</Button>
+                    </div>
+                </div>
+              </div>
+            ) : 
+              <ImageUploader addImageToReport={handleAddImageToReport}/>
+            }
         </div>
 
         {/* Submit button */}
