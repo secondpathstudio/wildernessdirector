@@ -23,26 +23,26 @@ export const NavbarMobile = () => {
             </NavigationMenuTrigger>
             <NavigationMenuContent className="flex flex-col p-1">
               <NavigationMenuLink
-                href="/fellowship"
+                href="http://www.ruhswilderness.com"
                 className={buttonVariants({ variant: "link" })}
               >
-                Fellowship
+                Fellowship @ RUHS
               </NavigationMenuLink>
-              <NavigationMenuLink
+              {/* <NavigationMenuLink
                 href="/mobile-app"
                 className={buttonVariants({ variant: "link" })}
               >
                 Mobile App
-              </NavigationMenuLink>
+              </NavigationMenuLink> */}
               {/* <NavigationMenuLink
                 href="#3"
                 className={buttonVariants({ variant: "link" })}
               >
                 Settings
               </NavigationMenuLink> */}
-              <div className="flex flex-col mb-0.5">
+              {/* <div className="flex flex-col mb-0.5">
                 <NavbarUserLinks />
-              </div>
+              </div> */}
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>

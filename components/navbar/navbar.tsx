@@ -12,7 +12,7 @@ export const NavBar: FC = () => {
         <nav className="container px-6 md:px-8 py-4">
           <div className="flex items-center">
             <Link href="/" className="hover:opacity-80 transition-opacity">
-              <div className="flex items-center">
+              <div className="flex items-center gap-1">
               <WildermedIcon 
                 leafColor={"#283618"} 
                 strokeWidth={"#000"} 
@@ -20,23 +20,23 @@ export const NavBar: FC = () => {
                 strokeColor={"#000"} 
                 size={24} 
               />
-                <span className="text-xl text-[#283618] font-semibold tracking-tighter mr-6">
-                  Wildermed
+                <span className="text-xl text-[#283618] font-semibold tracking-tighter">
+                  WildernessDirector
                 </span>
               </div>
             </Link>
             <div className="hidden md:flex justify-between grow">
               <div>
-                <Link href="/fellowship" className={buttonVariants({ variant: "link" })}>
-                  Fellowship
-                </Link>
-                <Link href="/mobile-app" className={buttonVariants({ variant: "link" })}>
-                  App
-                </Link>
+                <a target="_blank" href="http://www.ruhswilderness.com/" rel="noopener noreferrer">
+                  <button className={buttonVariants({ variant: "link" })}>Fellowship @ RUHS</button>
+                </a>
+                {/* <Link href="/mobile-app" className={buttonVariants({ variant: "link" })}>
+                  Mobile App
+                </Link> */}
               </div>
-              <div className="flex items-center space-x-4">
+              {/* <div className="flex items-center space-x-4">
                 <NavbarUserLinks />
-              </div>
+              </div> */}
             </div>
             <div className="grow md:hidden flex justify-end">
               <NavbarMobile />
