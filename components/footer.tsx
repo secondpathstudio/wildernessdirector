@@ -16,7 +16,7 @@ export const Footer = () => {
               target="_blank"
               className="font-medium underline underline-offset-4"
             > */}
-              CVEMUS
+              Second Path Studio
             {/* </a> */}
           </p>
         </div>
