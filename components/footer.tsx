@@ -11,13 +11,13 @@ export const Footer = () => {
         <div className="flex flex-col items-center gap-4 md:flex-row md:gap-2 md:px-0">
           <p className="text-center md:text-sm text-xs leading-loose md:text-left text-[#283618]">
             ©️ {year}{" "}
-            <a
+            {/* <a
               href="https://www.cvem.us"
               target="_blank"
               className="font-medium underline underline-offset-4"
-            >
-              Coachella Valley Emergency Medicine Ultrasound
-            </a>
+            > */}
+              CVEMUS
+            {/* </a> */}
           </p>
         </div>
       </div>
