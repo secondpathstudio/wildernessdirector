@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/card";
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, query, where } from "firebase/firestore";
+import ScheduleCalendar from "../ui/schedule-calendar";
 
 interface TopicOverviewProps {
   topicId: string;
+  topicData: any;
 }
 
 export const TopicOverview: FC<TopicOverviewProps> = (props) => {
@@ -32,6 +34,37 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
   const { status: fieldReportStatus, data: fieldReports } = useFirestoreCollectionData(fieldReportsQuery, {
       idField: 'id',
   });
+
+  const getMonth = (int: number) => {
+    switch (int) {
+      case 0:
+        return "July";
+      case 1:
+        return "August";
+      case 2:
+        return "September";
+      case 3:
+        return "October";
+      case 4:
+        return "November";
+      case 5:
+        return "December";
+      case 6:
+        return "January";
+      case 7:
+        return "February";
+      case 8:
+        return "March";
+      case 9:
+        return "April";
+      case 10:
+        return "May";
+      case 11:
+        return "June";
+      default:
+        return "Unknown";
+    }
+  }
 
   return (
     <>
@@ -103,7 +136,10 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-4">
               <CardHeader>
-                <CardTitle>Overview</CardTitle>
+                {/* <CardTitle>{getMonth(props.topicData?.topicNumber)} Schedule</CardTitle> */}
+                <ScheduleCalendar 
+                  topicNumber={props.topicData?.topicNumber}
+                />
               </CardHeader>
               <CardContent className="pl-2">{/* <Overview /> */}</CardContent>
             </Card>

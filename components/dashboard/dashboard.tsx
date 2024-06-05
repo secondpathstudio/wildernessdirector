@@ -1,4 +1,5 @@
 'use client';
+
 import { FC, useEffect, useState } from "react";
 import { getDocs, collection, query, orderBy, doc } from "firebase/firestore";
 import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc } from "reactfire";
@@ -48,7 +49,7 @@ export const Dashboard: FC = () => {
 
   
 
-  if (auth.currentUser === null) {
+  if (auth.currentUser === null || auth.currentUser === undefined) {
     return (
       <div className="flex justify-center items-center w-full">
         <Card>
@@ -73,6 +74,11 @@ export const Dashboard: FC = () => {
           <h2 className="text-3xl leading-5 font-bold tracking-tight">
             Fellowship Progress
           </h2>
+          <div>
+            {userData && userData.data()?.role === 'admin' && (
+              <div>Admin</div>
+            )}
+          </div>
         </div>
 
         <div className="flex">
