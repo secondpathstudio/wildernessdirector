@@ -34,9 +34,9 @@ export const NavBar: FC = () => {
                   Mobile App
                 </Link> */}
               </div>
-              <div className="flex items-center space-x-4">
+              {/* <div className="flex items-center space-x-4">
                 <NavbarUserLinks />
-              </div>
+              </div> */}
             </div>
             <div className="grow md:hidden flex justify-end">
               <NavbarMobile />
