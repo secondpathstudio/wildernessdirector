@@ -7,15 +7,16 @@ import { get } from 'request';
 
 type Props = {
     topicNumber: number
+    events: any[]
 }
 
 export default function ScheduleCalendar(props: Props) {
-    const [events, setEvents] = useState([
-        { title: 'Fellow Didactics', date: '2024-07-04' },
-        { title: 'Fellow Didactics', date: '2024-07-11' },
-        { title: 'Fellow Didactics', date: '2024-07-18' },
-        { title: 'Fellow Didactics', date: '2024-07-25' },
-    ])
+    // const [events, setEvents] = useState([
+    //     { title: 'Fellow Didactics', date: '2024-07-04' },
+    //     { title: 'Fellow Didactics', date: '2024-07-11' },
+    //     { title: 'Fellow Didactics', date: '2024-07-18' },
+    //     { title: 'Fellow Didactics', date: '2024-07-25' },
+    // ])
 
     const handleDateClick = (arg: any) => {
         alert(arg.dateStr)
@@ -49,7 +50,7 @@ export default function ScheduleCalendar(props: Props) {
         initialDate={getInitialDate()}
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
-        events={events}
+        events={props.events}
         dateClick={handleDateClick}
         eventContent={renderEventContent}
         headerToolbar={{

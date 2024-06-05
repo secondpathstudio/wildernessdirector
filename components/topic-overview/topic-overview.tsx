@@ -132,6 +132,7 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
                 {/* <CardTitle>{getMonth(props.topicData?.topicNumber)} Schedule</CardTitle> */}
                 <ScheduleCalendar 
                   topicNumber={props.topicData?.topicNumber}
+                  events={props.topicData?.events}
                 />
               </CardHeader>
               <CardContent className="pl-2">{/* <Overview /> */}</CardContent>
