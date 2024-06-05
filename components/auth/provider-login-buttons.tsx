@@ -44,6 +44,7 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
           await setDoc(doc(firestore, `users/${user.uid}`), {
             email: user.email,
             name: user.displayName || "",
+            role: "free",
             createdAt: new Date().toISOString(),
           });
         } catch (err) {

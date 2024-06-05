@@ -54,7 +54,7 @@ export const SignUpForm: FC<SignUpFormProps> = ({ onShowLogin, onSignUp }) => {
             email: result.user.email,
             createdAt: Timestamp.now(),
             name: result.user.displayName || "",
-            isAdmin: false,
+            role: "free",
           });
         } catch (err) {
           console.error(err);
