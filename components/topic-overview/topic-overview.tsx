@@ -54,7 +54,7 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
               </CardHeader>
               <CardContent>
                 {props.topicData?.userProgress?.length > 0 ? (
-                  <div className="text-2xl font-bold">{props.topicData.userProgress.find((u: any) => (u.userId === auth.currentUser?.uid)).completedObjectives}</div>
+                  <div className="text-2xl font-bold">{props.topicData.userProgress.find((u: any) => (u.userId === auth.currentUser?.uid))?.completedObjectives}</div>
                 ) :
                   <div className="text-2xl font-bold">0</div>
                 }

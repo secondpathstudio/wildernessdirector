@@ -27,7 +27,8 @@ export default function ScheduleCalendar(props: Props) {
             start: event.start.toLocaleDateString(),
             startDate: event.start,
             end: event.end ? event.end.toLocaleDateString() : 'N/A',
-            id: event.id
+            id: event.id,
+            description: event.extendedProps.description
         }
         console.log(eventDetails)
 
@@ -80,14 +81,11 @@ export default function ScheduleCalendar(props: Props) {
     <Dialog open={showEventDialog} onOpenChange={setShowEventDialog}>
         <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-            <DialogTitle>{currentEvent?.title}</DialogTitle>
+            <DialogTitle>{currentEvent?.title} ({currentEvent?.start} - {currentEvent?.end})</DialogTitle>
             </DialogHeader>
 
             <DialogDescription>
-                    Starts: {currentEvent?.start}
-            </DialogDescription>
-            <DialogDescription>
-                    Ends: {currentEvent?.end}
+                {currentEvent?.description || 'No description recorded.'}
             </DialogDescription>
 
             <DialogFooter>

@@ -9,9 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { DatePickerDialog } from "../ui/datepickerDialog";
-import { set } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { start } from "repl";
+import { Textarea } from "../ui/textarea";
 
 export const CalendarContainer: FC = () => {
   //get the topic data from the database
@@ -26,6 +25,7 @@ export const CalendarContainer: FC = () => {
   });
   const [newEvent, setNewEvent] = useState<any>({
     title: '',
+    description: '',
     startDate: new Date(),
     endDate: new Date(),
   });
@@ -77,6 +77,7 @@ export const CalendarContainer: FC = () => {
         month: scheduleMonth,
         events: [{
           title: newEvent.title,
+          description: newEvent.description,
           start: newEvent.startDate.toISOString().slice(0, 10),
           end: newEvent.endDate.toISOString().slice(0, 10),
           startDate: Timestamp.fromDate(newEvent.startDate),
@@ -101,6 +102,7 @@ export const CalendarContainer: FC = () => {
     }
     newEvents.push({
       title: newEvent.title,
+      description: newEvent.description,
       start: newEvent.startDate.toISOString().slice(0, 10),
       end: newEvent.endDate.toISOString().slice(0, 10),
       startDate: Timestamp.fromDate(newEvent.startDate),
@@ -164,24 +166,26 @@ export const CalendarContainer: FC = () => {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Event Title
-                  </Label>
                   <Input
                     id="name"
-                    defaultValue="New Event"
+                    defaultValue="Event Title"
                     className="col-span-3"
                     onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="username" className="text-right">
-                    Event Date
-                  </Label>
                   <DatePickerDialog 
                     onSelect={(dateRange: DateRange | undefined) => {handleNewEvent(dateRange)}}
                     selectedDate={new Date()} />
 
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Textarea
+                    id="description"
+                    defaultValue="Event description"
+                    className="col-span-3"
+                    onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                  />
                 </div>
               </div>
               <DialogFooter>

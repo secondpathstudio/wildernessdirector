@@ -105,7 +105,7 @@ export const Dashboard: FC = () => {
                   id={topic.id}
                   index={i}
                   totalCount={11}
-                  locked={false} 
+                  locked={isLocked} 
                   current={currentTopic === i}
                   percentage={progress}
                 />
