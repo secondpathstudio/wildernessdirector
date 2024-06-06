@@ -118,6 +118,14 @@ export default function ImageUploader(props: any) {
         </div>
       </DialogTrigger>
       <DialogContent>
+        {userRole !== "admin" && userRole !== "fellow" ? (
+          <DialogHeader>
+            <DialogTitle className=" text-center p-4 bg-red-100 text-red-800 rounded-md">
+              You do not have permission to upload images
+            </DialogTitle>
+          </DialogHeader>
+        )
+        : (        
         <DialogHeader>
           <DialogTitle className=" mb-3">Upload Image</DialogTitle>
 
@@ -184,7 +192,7 @@ export default function ImageUploader(props: any) {
             />
           </div>
         </DialogHeader>
-
+        )}
         <DialogFooter className=" flex items-center justify-end gap-x-2">
           <DialogClose asChild>
             <Button
