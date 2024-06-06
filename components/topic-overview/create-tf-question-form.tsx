@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "../ui/textarea";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
+import { useUserStore } from "@/lib/store";
 
 
 interface QuestionFormProps {
@@ -28,6 +29,7 @@ export const CreateTFQuestionForm: FC<QuestionFormProps> = (props) => {
     explanation: "",
     topicId: props.topicId ? props.topicId : "unknownTopicId",
   });
+  const userRole = useUserStore((state) => state.role);
 
   const auth = useAuth();
 
@@ -40,6 +42,13 @@ export const CreateTFQuestionForm: FC<QuestionFormProps> = (props) => {
         title: "You need to be logged in to create a question",
       })
       setIsLoading(false);
+      return;
+    }
+
+    if (userRole !== 'admin' && userRole !== 'fellow') {
+      toast({
+        title: "You do not have permission to create questions",
+      })
       return;
     }
 
