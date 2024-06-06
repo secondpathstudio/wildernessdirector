@@ -9,6 +9,7 @@ import { QuestionCreator } from "./question-creator";
 import { TopicObjectives } from "./topic-objectives";
 import { TopicQuestions } from "./topic-questions";
 import { FieldReports } from "./field-reports";
+import { getMonth } from "@/lib/CONSTANTS";
 
 export const TopicContainer: FC = () => {
   const params = useSearchParams();
@@ -29,7 +30,7 @@ export const TopicContainer: FC = () => {
       <div className="flex-col md:flex">
         <div className="flex items-end justify-between space-y-2 mb-6">
           <h2 className="text-3xl leading-5 font-bold tracking-tight">
-            {data?.data()?.topicName || "Loading..."}
+            {getMonth(data?.data()?.topicNumber)}: {data?.data()?.topicName || "Loading..."}
           </h2>
         </div>
         <div className="flex h-16 items-center bg-muted px-6 rounded-xl">

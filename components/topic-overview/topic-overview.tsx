@@ -8,10 +8,10 @@ import {
   CardDescription,
   LinkCard,
 } from "@/components/ui/card";
-import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
-import { collection, query, where } from "firebase/firestore";
-import ScheduleCalendar from "../ui/schedule-calendar";
+import { useAuth, useFirestore, useFirestoreCollectionData, useFirestoreDocData } from "reactfire";
+import { collection, doc, query, where } from "firebase/firestore";
 import { BookOpen, FileQuestion, ListChecks } from "lucide-react";
+import { getMonth } from "@/lib/CONSTANTS";
 
 interface TopicOverviewProps {
   topicId: string;
@@ -36,36 +36,10 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
       idField: 'id',
   });
 
-  const getMonth = (int: number) => {
-    switch (int) {
-      case 0:
-        return "July";
-      case 1:
-        return "August";
-      case 2:
-        return "September";
-      case 3:
-        return "October";
-      case 4:
-        return "November";
-      case 5:
-        return "December";
-      case 6:
-        return "January";
-      case 7:
-        return "February";
-      case 8:
-        return "March";
-      case 9:
-        return "April";
-      case 10:
-        return "May";
-      case 11:
-        return "June";
-      default:
-        return "Unknown";
-    }
-  }
+  const scheduleDoc = doc(firestore, "schedules", props.topicId);
+  const { status: schedulesStatus, data: schedule } = useFirestoreDocData(scheduleDoc, {
+    idField: 'id',
+  });
 
   return (
     <>
@@ -126,14 +100,40 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
             </Card>
             
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+            <Card className="lg:col-span-6 md:col-span-2 col-span-1">
               <CardHeader>
-                {/* <CardTitle>{getMonth(props.topicData?.topicNumber)} Schedule</CardTitle> */}
-                <ScheduleCalendar 
-                  topicNumber={props.topicData?.topicNumber}
-                  events={props.topicData?.events}
-                />
+                <CardTitle>{getMonth(props.topicData.topicNumber)} Events</CardTitle>
+                {schedulesStatus === "loading" && (
+                  <CardContent>Loading...</CardContent>
+                )}
+                {schedulesStatus === "error" && (
+                  <CardContent>Error loading events...</CardContent>
+                )}
+                {schedulesStatus === "success" && (
+                  <CardContent>
+                    {schedule?.events?.length > 0 ? schedule.events.map((event: any, index: number) => {
+                      return (
+                        <div key={index} className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <div className="text-lg font-semibold">
+                            {event.startDate.toDate().getDate() === event.endDate.toDate().getDate()
+                              ? 
+                              event.startDate?.toDate().getDate() 
+                              : event.startDate?.toDate().getDate() + "-" + event.endDate?.toDate().getDate()
+                              }
+                            </div>
+                            <div className="text-md text-gray-700">
+                            {event.title}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }) : (
+                      <div className="text-sm text-gray-500">No events scheduled</div>
+                  )}
+                  </CardContent>
+                )}
               </CardHeader>
               <CardContent className="pl-2">{/* <Overview /> */}</CardContent>
             </Card>
