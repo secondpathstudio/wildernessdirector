@@ -9,22 +9,31 @@ import Link from "next/link";
 import { FC, useEffect } from "react";
 import { useUser } from "reactfire";
 import { useRouter, usePathname } from "next/navigation";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 
 export const NavbarUserLinks: FC = () => {
   const { data, hasEmitted } = useUser();
+  const firestore = getFirestore();
   const userRole = useUserStore((state) => state.role);
-  const pathname = usePathname();
+  const setUserRole = useUserStore((state) => state.setRole);
   const router = useRouter();
 
   useEffect(() => {
-    if (hasEmitted) {
-      if (!data && !pathname?.includes("/login")) {
-        router.push("/login");
-      } else {
-        router.push("/home");
-      }
-    } 
-  }, [hasEmitted, data, router]);
+    console.log("help")
+    if (hasEmitted && data) {
+        const userDoc = doc(firestore, "users", data.uid);
+        //check for user role
+        
+        getDoc(userDoc).then((doc) => {
+          if (doc.exists()) {
+            console.log("Setting user role", doc.data().role)
+            setUserRole(doc.data().role);
+          }
+        });
+    } else {
+      console.log("No user data")
+    }
+  }, [hasEmitted, data]);
 
   return (
     <>

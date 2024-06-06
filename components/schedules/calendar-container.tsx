@@ -172,7 +172,7 @@ export const CalendarContainer: FC = () => {
           </h2>
           <Dialog open={showAddEventDialog} onOpenChange={setShowAddEventDialog}>
             <DialogTrigger>
-              <Button>Add Event</Button>
+              <Button variant={"default"}>Add Event</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>

@@ -31,9 +31,6 @@ export const NavBar: FC = () => {
                 <a target="_blank" href="http://www.ruhswilderness.com/" rel="noopener noreferrer">
                   <button className={buttonVariants({ variant: "link" })}>Fellowship @ RUHS</button>
                 </a>
-                {/* <Link href="/mobile-app" className={buttonVariants({ variant: "link" })}>
-                  Mobile App
-                </Link> */}
               </div>
               <div className="flex items-center space-x-4">
                 <NavbarUserLinks />
