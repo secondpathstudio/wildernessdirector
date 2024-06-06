@@ -72,13 +72,8 @@ export const Dashboard: FC = () => {
       <div className="flex-col relative">
         <div className="flex items-end justify-between space-y-2 mb-6">
           <h2 className="text-3xl leading-5 font-bold tracking-tight">
-            Fellowship Progress
+            Fellowship Curriculum
           </h2>
-          <div>
-            {userData && userData.data()?.role === 'admin' && (
-              <div>Admin</div>
-            )}
-          </div>
         </div>
 
         <div className="flex">

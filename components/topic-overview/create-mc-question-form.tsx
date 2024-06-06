@@ -9,6 +9,7 @@ import { useAuth, useFirestore } from "reactfire";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
+import { useUserStore } from "@/lib/store";
 
 interface QuestionFormProps {
   topicId: string;
@@ -30,13 +31,20 @@ export const CreateMCQuestionForm: FC<QuestionFormProps> = (props) => {
     reference: "",
     explanation: "",
     topicId: props.topicId ? props.topicId : "unknownTopicId",
-  
   })
+  const userRole = useUserStore((state) => state.role);
 
   const auth = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (userRole !== 'admin' && userRole !== 'fellow') {
+      toast({
+        title: "You do not have permission to create questions",
+      })
+      return;
+    }
+
     setIsLoading(true);
 
     if (auth.currentUser === null) {

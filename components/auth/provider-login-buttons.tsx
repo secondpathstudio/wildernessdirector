@@ -1,5 +1,6 @@
 "use client";
 
+import { useUserStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import {
@@ -20,6 +21,8 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
   const auth = useAuth();
   const firestore = useFirestore();
   const [isLoading, setIsLoading] = useState(false);
+  const setUserRole = useUserStore((state) => state.setRole);
+
 
   const doProviderSignIn = async (provider: GoogleAuthProvider) => {
     try {
@@ -37,6 +40,11 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
           const userData = await getDoc(userDoc);
           if (userData.exists()) {
             //user exists already
+            const dbRole = userData.data().role;
+          
+            console.log("Found user, setting role: ", dbRole)
+            setUserRole(dbRole);
+
             return;
           }
 
@@ -47,6 +55,7 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
             role: "free",
             createdAt: new Date().toISOString(),
           });
+
         } catch (err) {
           console.error(err);
           toast({ title: "Error creating user", description: `${err}` });

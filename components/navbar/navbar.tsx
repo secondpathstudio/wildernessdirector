@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FC } from "react";
 
 export const NavBar: FC = () => {
+
   return (
     <>
       <div className="animate-in fade-in w-full">

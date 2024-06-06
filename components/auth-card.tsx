@@ -11,18 +11,11 @@ import {
 } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useUser } from "reactfire";
 
 export const AuthCard = () => {
   const [isShowingSignUp, setIsShowingSignUp] = useState<boolean>(false);
-  const { data: user } = useUser();
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      router.push("/home");
-    }
-  }, [user]);
   return (
     <>
       <Card>

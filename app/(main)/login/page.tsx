@@ -3,11 +3,9 @@ import { ProviderLoginButtons } from "@/components/auth/provider-login-buttons";
 import { OrSeparator } from "@/components/ui/or-separator";
 
 export default function LoginPage() {
+
   return (
     <div className="grow flex flex-col items-center justify-center">
-        {/* <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-          Wildermed Login
-        </h1> */}
         <AuthCard />
         <OrSeparator />
         <ProviderLoginButtons />

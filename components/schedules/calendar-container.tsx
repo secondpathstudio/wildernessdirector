@@ -11,6 +11,8 @@ import { Label } from "../ui/label";
 import { DatePickerDialog } from "../ui/datepickerDialog";
 import { DateRange } from "react-day-picker";
 import { Textarea } from "../ui/textarea";
+import { useUserStore } from "@/lib/store";
+import { toast } from "../ui/use-toast";
 
 export const CalendarContainer: FC = () => {
   //get the topic data from the database
@@ -29,6 +31,7 @@ export const CalendarContainer: FC = () => {
     startDate: new Date(),
     endDate: new Date(),
   });
+  const userRole = useUserStore((state) => state.role);
 
 
   if (schedulesStatus === "loading") {
@@ -54,6 +57,13 @@ export const CalendarContainer: FC = () => {
   }
 
   const handleAddEvent = async () => {
+    if (userRole !== 'admin' && userRole !== 'fellow') {
+      toast({
+        title: "You do not have permission to create events!",
+      })
+      return;
+    }
+
     //add new event to firestore
     //get the schedule document to check if schedule for the month already exists
     setUpdating(true);
@@ -127,6 +137,13 @@ export const CalendarContainer: FC = () => {
   }
 
   const handleEventDelete = async (id: string, startDate: Date) => {
+    if (userRole !== 'admin' && userRole !== 'fellow') {
+      toast({
+        title: "You do not have permission to delete events!",
+      })
+      return;
+    }
+    
     try {
         const scheduleMonth = getAcademicMonthNumber(startDate.getMonth());
         const scheduleToUpdate = schedules.find((s: any) => s.month === scheduleMonth);

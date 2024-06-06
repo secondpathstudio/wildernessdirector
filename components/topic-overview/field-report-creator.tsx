@@ -20,6 +20,7 @@ import { toast } from "../ui/use-toast";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
 import ImageUploader from "../ui/image-uploader";
 import { Trash } from "lucide-react";
+import { useUserStore } from "@/lib/store";
 
 interface FieldReportCreatorProps {
     topicId: string;
@@ -37,13 +38,23 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
     topicId: props.topicId ? props.topicId : "unknownTopicId",
     images: [] as string[],
   })
+  const userRole = useUserStore((state) => state.role);
 
   const auth = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    if (userRole !== 'admin' && userRole !== 'fellow') {
+      toast({
+        title: "You do not have permission to create field reports",
+      })
+      setIsLoading(false);
+      return;
+    }
 
+    
     if (auth.currentUser === null) {
       toast({
         title: "You need to be logged in to create a field report.",

@@ -13,10 +13,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/use-toast";
 import { getAuth, signOut } from "firebase/auth";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFirestore, useFirestoreDoc, useUser } from "reactfire";
 
-export function UserNav() {
+interface UserNavProps {
+  userRole: string;
+}
+
+export function UserNav({ userRole }: UserNavProps) {
   const { data: userAuth } = useUser(); 
   const router = useRouter();
   const doLogout = async () => {
@@ -27,11 +32,12 @@ export function UserNav() {
     });
     router.replace("/");
   };
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-10 w-10">
+          <Avatar className={`h-10 w-10 ${userRole === 'admin' && 'border-4 border-yellow-400'}`}>
             <AvatarImage
               src={userAuth?.photoURL || "/avatars/04.png"}
               alt="@shadcn"
@@ -57,8 +63,11 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          {}
-          {/* <DropdownMenuItem>Settings</DropdownMenuItem> */}
+          {userRole === "admin" && (
+          <DropdownMenuItem>
+            <Link href="/admin">Admin</Link>
+          </DropdownMenuItem>
+          )}
           {/* <DropdownMenuItem>Billing</DropdownMenuItem>
           <DropdownMenuItem>Profile</DropdownMenuItem>
           <DropdownMenuItem>New Team</DropdownMenuItem> */}

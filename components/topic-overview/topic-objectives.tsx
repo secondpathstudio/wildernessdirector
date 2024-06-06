@@ -14,6 +14,8 @@ import { Timestamp, collection, doc, query, setDoc } from "firebase/firestore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
+import { useUserStore } from "@/lib/store";
+import { toast } from "../ui/use-toast";
 
 interface TopicObjectivesProps {
   topicId: string;
@@ -26,13 +28,21 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
   const { status, data: topicData } = useFirestoreDoc(topicDoc);
   const topicObjectivesCollection = collection(firestore, "topics", props.topicId, "objectives");
   const { status: topicObjectivesStatus, data: topicObjectivesData } = useFirestoreCollection(topicObjectivesCollection);
+  const userRole = useUserStore((state) => state.role);
 
   const markObjectiveCompleted = async (objectiveId: string) => {
-    const objectiveDoc = doc(firestore, "topics", props.topicId, "objectives", objectiveId);
-
     if (auth.currentUser === null) {
       return;
     }
+
+    if (userRole !== 'admin' && userRole !== 'fellow') {
+      toast({
+        title: "You do not have permission to complete objectives",
+      })
+      return;
+    }
+    
+    const objectiveDoc = doc(firestore, "topics", props.topicId, "objectives", objectiveId);
 
     //update objective document
     var completedByArray: object[] = [];

@@ -20,7 +20,7 @@ import { useAuth, useFirestore, useFirestoreDocData, useFirestoreDocDataOnce, us
 import { GoogleAuthProvider, getRedirectResult, signInWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
 import { ModalForgotPassword } from "@/components/auth/modal-forgot-password";
 import { useRouter } from "next/navigation";
-import { doc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 
 const formSchema = z.object({
@@ -56,18 +56,14 @@ export const SignInForm: FC<SignInFormProps> = ({ onShowSignUp }) => {
 
       if (result.user) {
         console.log("get user data")
-        // const userDoc = doc(firestore, `users/${result.user.uid}`);
-        // const userData = await useFirestoreDocDataOnce(userDoc);
-        // if (userData.exists) {
-        //   // user exists
-        //   return;
-        // }
-
-        // await userDoc.set({
-        //   email: result.user.email,
-        //   name: result.user.displayName || "",
-        //   createdAt: new Date().toISOString(),
-        // });
+        const userDoc = doc(firestore, `users/${result.user.uid}`);
+        const userData = await getDoc(userDoc);
+        if (userData.exists()) {
+          const userRole = userData.data().role;
+          
+          
+          return;
+        }
       }
 
       toast({
