@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useCallback } from "react";
 import Dropzone, { useDropzone } from "react-dropzone";
 import 'firebase/storage';
+import { toast } from "../ui/use-toast";
 import { StorageProvider, useAuth, useFirebaseApp, useStorage, useStorageDownloadURL, useStorageTask } from "reactfire";
 import { ref, uploadBytesResumable, getStorage, getDownloadURL } from "firebase/storage";
 import type { UploadTaskSnapshot, UploadTask, StorageReference } from "firebase/storage";
@@ -23,6 +24,7 @@ import Image from "next/image";
 import RadialProgress from "./radial-progress";
 import { Upload, UploadCloud } from "lucide-react";
 import { Progress } from "./progress";
+import { useUserStore } from "@/lib/store";
 
 export default function ImageUploader(props: any) {
   const auth = useAuth();
@@ -34,6 +36,7 @@ export default function ImageUploader(props: any) {
   const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(
     null
   );
+  const userRole = useUserStore((state) => state.role);
 
   const onUploadProgress = (progressEvent: any) => {
     const percentage = Math.round(
@@ -60,6 +63,14 @@ export default function ImageUploader(props: any) {
 
   const handleImageUpload = async (image: File) => {
     if (!image || auth.currentUser === null) return;
+
+    if (userRole !== "admin" && userRole !== "fellow") {
+      toast({
+        title: "You do not have permission to upload images.",
+      })
+      return;
+    }
+    
     setLoading(true);
     const fileToUpload = image;
     const fileName = fileToUpload.name;
