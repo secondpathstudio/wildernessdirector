@@ -123,8 +123,11 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
                               : event.startDate?.toDate().getDate() + "-" + event.endDate?.toDate().getDate()
                               }
                             </div>
-                            <div className="text-md text-gray-700">
-                            {event.title}
+                            <div className="text-md text-gray-700 flex gap-2">
+                              {event.title}
+                              {event.description != "" && (
+                                <span className="italic">({event.description})</span>
+                              )}
                             </div>
                           </div>
                         </div>

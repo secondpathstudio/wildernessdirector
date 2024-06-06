@@ -168,7 +168,8 @@ export const CalendarContainer: FC = () => {
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Input
                     id="name"
-                    defaultValue="Event Title"
+                    placeholder="Event Title"
+                    value={newEvent.title}
                     className="col-span-3"
                     onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
                   />
@@ -182,7 +183,8 @@ export const CalendarContainer: FC = () => {
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Textarea
                     id="description"
-                    defaultValue="Event description"
+                    placeholder="Event description"
+                    value={newEvent.description}
                     className="col-span-3"
                     onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
                   />
