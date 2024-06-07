@@ -13,6 +13,7 @@ import { collection, doc, query, where } from "firebase/firestore";
 import { BookOpen, FileQuestion, ListChecks } from "lucide-react";
 import { getMonth } from "@/lib/CONSTANTS";
 import ProgressCard from "./progress-card";
+import EventListItem from "./event-list-item";
 
 interface TopicOverviewProps {
   topicId: string;
@@ -81,23 +82,11 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
                   <CardContent>
                     {schedule?.events?.length > 0 ? schedule.events.map((event: any, index: number) => {
                       return (
-                        <div key={index} className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2">
-                            <div className="text-lg font-semibold">
-                            {event.startDate.toDate().getDate() === event.endDate.toDate().getDate()
-                              ? 
-                              event.startDate?.toDate().getDate() 
-                              : event.startDate?.toDate().getDate() + "-" + event.endDate?.toDate().getDate()
-                              }
-                            </div>
-                            <div className="text-md text-gray-700 flex gap-2">
-                              {event.title}
-                              {event.description != "" && (
-                                <span className="italic">({event.description})</span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
+                        <EventListItem
+                          event={event}
+                          index={index}
+                          key={index}
+                        />
                       );
                     }) : (
                       <div className="text-sm text-gray-500">No events scheduled</div>
