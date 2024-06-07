@@ -19,7 +19,6 @@ export const NavbarUserLinks: FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("help")
     if (hasEmitted && data) {
         const userDoc = doc(firestore, "users", data.uid);
         //check for user role

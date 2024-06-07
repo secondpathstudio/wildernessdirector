@@ -6,7 +6,7 @@ import { BookOpen, FileQuestion, ListChecks } from "lucide-react";
 
 interface TopicNavProps {
   changeTab: (index: number) => void,
-  activeTab: number
+  activePage: number
 }
 
 export const MainNav: FC<TopicNavProps> = ({ changeTab, ...props }) => {
@@ -18,25 +18,25 @@ export const MainNav: FC<TopicNavProps> = ({ changeTab, ...props }) => {
       >
         <button
           onClick={() => changeTab(0)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 0 && 'text-primary'}`}
+          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 0 && 'text-primary'}`}
         >
           Overview
         </button>
         <button
           onClick={() => changeTab(1)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 1 && 'text-primary'}`}
+          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 1 && 'text-primary'}`}
         >
           Objectives
         </button>
         <button
           onClick={() => changeTab(2)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 2 && 'text-primary'}`}
+          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 2 && 'text-primary'}`}
         >
           Field Reports
         </button>
         <button
           onClick={() => changeTab(3)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 3 && 'text-primary'}`}
+          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 3 && 'text-primary'}`}
         >
           Questions
         </button>
@@ -47,25 +47,25 @@ export const MainNav: FC<TopicNavProps> = ({ changeTab, ...props }) => {
       >
         <button
           onClick={() => changeTab(0)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 0 && 'text-primary'}`}
+          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 0 && 'text-primary'}`}
         >
           Overview
         </button>
         <button
           onClick={() => changeTab(1)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 1 && 'text-primary'}`}
+          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 1 && 'text-primary'}`}
         >
           <ListChecks />
         </button>
         <button
           onClick={() => changeTab(2)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 2 && 'text-primary'}`}
+          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 2 && 'text-primary'}`}
         >
           <BookOpen />
         </button>
         <button
           onClick={() => changeTab(3)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activeTab === 3 && 'text-primary'}`}
+          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 3 && 'text-primary'}`}
         >
           <FileQuestion />
         </button>
