@@ -14,6 +14,7 @@ import { Textarea } from "../ui/textarea";
 import { useUserStore } from "@/lib/store";
 import { toast } from "../ui/use-toast";
 
+
 export const CalendarContainer: FC = () => {
   //get the topic data from the database
   const firestore = useFirestore();
@@ -166,15 +167,15 @@ export const CalendarContainer: FC = () => {
   return (
     <>
     <div className="flex-col md:flex">
-        <div className="flex items-end justify-between space-y-2 mb-6">
-          <h2 className="text-3xl leading-5 font-bold tracking-tight">
+        <div className="flex items-center md:items-end justify-between space-y-2 mb-6">
+          <h2 className="text-2xl md:text-3xl leading-5 font-bold tracking-tight">
             Master Schedule
           </h2>
           <Dialog open={showAddEventDialog} onOpenChange={setShowAddEventDialog}>
             <DialogTrigger>
               <Button variant={"default"}>Add Event</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] w-11/12">
               <DialogHeader>
                 <DialogTitle>Add Event</DialogTitle>
                 <DialogDescription>
@@ -185,6 +186,7 @@ export const CalendarContainer: FC = () => {
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Input
                     id="name"
+                    autoComplete="name"
                     placeholder="Event Title"
                     value={newEvent.title}
                     className="col-span-3"
@@ -200,6 +202,7 @@ export const CalendarContainer: FC = () => {
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Textarea
                     id="description"
+                    autoComplete="off"
                     placeholder="Event description"
                     value={newEvent.description}
                     className="col-span-3"
@@ -224,7 +227,7 @@ export const CalendarContainer: FC = () => {
           </Dialog>
           
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 h-full">
           <ScheduleCalendar 
             topicNumber={currentMonth} 
             events={schedules?.find((s: any) => s.month === currentMonth)?.events || []} 

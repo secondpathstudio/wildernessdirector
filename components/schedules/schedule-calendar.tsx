@@ -71,15 +71,16 @@ export default function ScheduleCalendar(props: Props) {
         eventContent={renderEventContent}
         eventClassNames={'bg-primary'}
         headerToolbar={{
-            left: 'title',
-            center: '',
-            right: 'today prev,next'
+            left: 'prev',
+            center: 'title',
+            right: 'next'
         }}
+
         datesSet={(dateInfo) => {props.handleChangeMonth(dateInfo.view.currentStart)}}
         eventBorderColor='#000000'
     />
     <Dialog open={showEventDialog} onOpenChange={setShowEventDialog}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] w-11/12">
             <DialogHeader>
             <DialogTitle>{currentEvent?.title} ({currentEvent?.start} - {currentEvent?.end})</DialogTitle>
             </DialogHeader>
@@ -102,6 +103,6 @@ export default function ScheduleCalendar(props: Props) {
 
 function renderEventContent(eventInfo: any) {
     return (
-        <p className='text-xs bg-primary !border-none'>{eventInfo.event.title}</p>
+        <p className='text-xs bg-primary'>{eventInfo.event.title}</p>
     )
 }
