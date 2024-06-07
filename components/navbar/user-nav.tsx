@@ -68,9 +68,6 @@ export function UserNav({ userRole }: UserNavProps) {
             <Link href="/admin">Admin</Link>
           </DropdownMenuItem>
           )}
-          {/* <DropdownMenuItem>Billing</DropdownMenuItem>
-          <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>New Team</DropdownMenuItem> */}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={doLogout}>Log out</DropdownMenuItem>

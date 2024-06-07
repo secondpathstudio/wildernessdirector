@@ -38,21 +38,23 @@ export const NavbarUserLinks: FC = () => {
   return (
     <>
       {hasEmitted && data ? (
-        <>
+        <nav className="flex flex-col md:flex-row gap-2 md:items-center mb-4 md:mb-0 px-2">
           <Link href="/home/calendar" className={buttonVariants({variant: "outline"})}>
             <div className="flex gap-2 items-center">Schedule <Calendar /></div>
           </Link>
           <Link href="/home" className={buttonVariants({variant: "default"})}>
             Curriculum &rarr;
           </Link>
-          <UserNav userRole={userRole}/>
-        </>
+          <div className="rounded-md bg-gray-200 md:bg-transparent flex items-center justify-end p-2">
+            <UserNav userRole={userRole}/>
+          </div>
+        </nav>
       ) : (
-        <>
+        <nav>
           <Link href="/login" className={buttonVariants()}>
-            Fellow Login &rarr;
+            Login &rarr;
           </Link>
-        </>
+        </nav>
       )}
     </>
   );

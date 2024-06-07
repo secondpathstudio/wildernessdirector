@@ -28,21 +28,9 @@ export const NavbarMobile = () => {
               >
                 Fellowship @ RUHS
               </NavigationMenuLink>
-              {/* <NavigationMenuLink
-                href="/mobile-app"
-                className={buttonVariants({ variant: "link" })}
-              >
-                Mobile App
-              </NavigationMenuLink> */}
-              {/* <NavigationMenuLink
-                href="#3"
-                className={buttonVariants({ variant: "link" })}
-              >
-                Settings
-              </NavigationMenuLink> */}
-              {/* <div className="flex flex-col mb-0.5">
+              <div className="flex flex-col">
                 <NavbarUserLinks />
-              </div> */}
+              </div>
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
