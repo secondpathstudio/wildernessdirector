@@ -36,7 +36,10 @@ export function UserNav({ userRole }: UserNavProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <Button variant="ghost" className="relative w-full md:h-8 md:w-8 rounded-full flex hover:bg-transparent">
+          <h5 className="md:hidden md:invisible w-full">
+            {userAuth?.displayName?.split(" ")[0] || userAuth?.email?.split("@")[0] || "Anonymous"}
+          </h5>
           <Avatar className={`h-10 w-10 ${userRole === 'admin' && 'border-4 border-yellow-400'}`}>
             <AvatarImage
               src={userAuth?.photoURL || "/avatars/04.png"}

@@ -26,7 +26,7 @@ export const NavBar: FC = () => {
                 </span>
               </div>
             </Link>
-            <div className="hidden md:flex justify-between grow">
+            <div className="hidden md:flex justify-between grow items-center">
               <div>
                 <a target="_blank" href="http://www.ruhswilderness.com/" rel="noopener noreferrer">
                   <button className={buttonVariants({ variant: "link" })}>Fellowship @ RUHS</button>
