@@ -9,9 +9,9 @@ import { ReactNode } from "react";
 const font = Work_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Wildermed | Wilderness Medicine in Southern California",
+  title: "Wilderness Director | A Comprehensive Wilderness Medicine Platform",
   description:
-    "Wildermed is a project of Coachella Valley Emergency Medicine Ultrasound. We are dedicated to providing high-quality wilderness medicine education in Southern California between Riverside University Health System and Desert Regional Medical Center.",
+    "Wilderness Director is a comprehensive platform for wilderness medicine fellowship education, training, and certification.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
