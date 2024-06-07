@@ -12,6 +12,7 @@ import { useAuth, useFirestore, useFirestoreCollectionData, useFirestoreDocData 
 import { collection, doc, query, where } from "firebase/firestore";
 import { BookOpen, FileQuestion, ListChecks } from "lucide-react";
 import { getMonth } from "@/lib/CONSTANTS";
+import ProgressCard from "./progress-card";
 
 interface TopicOverviewProps {
   topicId: string;
@@ -44,61 +45,27 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
   return (
     <>
         <div className="flex-1 space-y-4 pt-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Objectives Completed
-                </CardTitle>
-                <ListChecks />
-              </CardHeader>
-              <CardContent>
-                {props.topicData?.userProgress?.length > 0 ? (
-                  <div className="text-2xl font-bold">{props.topicData.userProgress.find((u: any) => (u.userId === auth.currentUser?.uid))?.completedObjectives}</div>
-                ) :
-                  <div className="text-2xl font-bold">0</div>
-                }
-              </CardContent>
-            </Card>
-          <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Field Reports
-                </CardTitle>
-                <BookOpen />
-              </CardHeader>
-              <CardContent>
-                {fieldReportStatus === "loading" && (
-                  <div className="text-2xl font-bold">...</div>
-                )}
-                {fieldReportStatus === "error" && (
-                  <div className="text-2xl font-bold">Error loading reports...</div>
-                )}
-                {fieldReportStatus === "success" && (
-                  <div className="text-2xl font-bold">{fieldReports.length}</div>
-                )}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Questions Submitted
-                </CardTitle>
-                <FileQuestion />
-              </CardHeader>
-              <CardContent>
-                {questionStatus === "loading" && (
-                  <div className="text-2xl font-bold">...</div>
-                )}
-                {questionStatus === "error" && (
-                  <div className="text-2xl font-bold">!</div>
-                )}
-                {questionStatus === "success" && (
-                  <div className="text-2xl font-bold">{questions.length}</div>
-                )}
-              </CardContent>
-            </Card>
-            
+          <div className="grid gap-4 grid-cols-3">
+          <ProgressCard 
+            topicData={props.topicData} 
+            auth={auth} 
+            titleText="Objectives Completed"
+          />
+          <ProgressCard 
+            topicData={props.topicData} 
+            auth={auth} 
+            titleText="Field Reports"
+            fieldReportStatus={fieldReportStatus}
+            fieldReports={fieldReports}
+          />
+          <ProgressCard 
+            topicData={props.topicData} 
+            auth={auth} 
+            titleText="Questions Submitted" 
+            questionStatus={questionStatus}
+            questions={questions}
+          />
+           
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
             <Card className="lg:col-span-6 md:col-span-2 col-span-1">
