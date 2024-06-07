@@ -15,9 +15,8 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc } from "reactfire";
 import { toast } from "../ui/use-toast";
-import { Timestamp, addDoc, collection, deleteDoc, doc, setDoc } from "firebase/firestore";
+import { Timestamp, addDoc, collection, deleteDoc, doc, query, setDoc, orderBy } from "firebase/firestore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import Link from "next/link";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 
 interface AdminObjectiveCreatorProps {
@@ -29,7 +28,10 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
   const firestore = useFirestore();
   const topicDoc = doc(firestore, "topics", props.topicId);
   const topicObjectivesCollection = collection(firestore, "topics", props.topicId, "objectives");
-  const { status: topicObjectivesStatus, data: topicObjectives } = useFirestoreCollection(topicObjectivesCollection);
+  const topicObjectivesQuery = query(topicObjectivesCollection,
+    orderBy("reference", "asc"),
+  );
+  const { status: topicObjectivesStatus, data: topicObjectives } = useFirestoreCollection(topicObjectivesQuery);
   const { status, data: topicData } = useFirestoreDoc(topicDoc);
   const [isLoading, setIsLoading] = useState(false);
   const [newObjective, setNewObjective] = useState({
