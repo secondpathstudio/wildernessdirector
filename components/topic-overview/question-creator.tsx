@@ -20,7 +20,7 @@ interface QuestionCreatorProps {
 export const QuestionCreator: FC<QuestionCreatorProps> = (props) => {
 
   return (
-    <Card className="col-span-3">
+    <Card className="col-span-4 lg:col-span-3">
       <CardHeader>
         <CardTitle className="pb-2">Question Creator</CardTitle>
         <CardContent>
