@@ -15,7 +15,7 @@ import AddUserForm from "./add-user-form";
 
 export const AdminContainer: FC = () => {
     const user = useUser();
-  const [activeTab, setActiveTab] = useState(0); 
+  const [activePage, setActivePage] = useState(0); 
   const [currentUserId, setCurrentUserId] = useState<string | undefined>("");
   const firestore = useFirestore();
   const usersCollection = collection(firestore, "users");
@@ -37,8 +37,8 @@ export const AdminContainer: FC = () => {
         </div>
         <div className="flex h-16 items-center bg-muted px-6 rounded-xl justify-between">
           <MainNav 
-            changeTab={setActiveTab}
-            activeTab={activeTab} 
+            changeTab={setActivePage}
+            activePage={activePage} 
           />
           <div className="flex items-center gap-4">
             Current User: 
@@ -72,10 +72,10 @@ export const AdminContainer: FC = () => {
         </div>
         
       
-        {activeTab === 0 && <AdminOverview userId={currentUserId} users={users?.docs}/>}
-        {activeTab === 1 && <AdminTopics />}
-        {activeTab === 2 && <AdminFieldReports />}
-        {activeTab === 3 && <AdminTopicQuestions />}
+        {activePage === 0 && <AdminOverview userId={currentUserId} users={users?.docs}/>}
+        {activePage === 1 && <AdminTopics />}
+        {activePage === 2 && <AdminFieldReports />}
+        {activePage === 3 && <AdminTopicQuestions />}
         
       </div>
     </>
