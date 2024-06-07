@@ -100,7 +100,7 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
 
 
   return (
-    <Card className="col-span-3">
+    <Card className="col-span-4 lg:col-span-3">
       <CardHeader>
         <CardTitle className="pb-2">Field Report Creator</CardTitle>
       </CardHeader>

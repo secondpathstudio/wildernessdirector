@@ -14,7 +14,7 @@ import { getMonth } from "@/lib/CONSTANTS";
 export const TopicContainer: FC = () => {
   const params = useSearchParams();
   const topicId = params?.get("topicId") || "noTopicId";
-  const [activeTab, setActiveTab] = useState(0); 
+  const [activePage, setActivePage] = useState(0); 
 
   //get the topic data from the database
   const firestore = useFirestore();
@@ -38,15 +38,15 @@ export const TopicContainer: FC = () => {
         </div>
         <div className="flex h-16 items-center bg-muted px-6 rounded-xl">
           <MainNav 
-            changeTab={setActiveTab}
-            activeTab={activeTab}
+            changeTab={setActivePage}
+            activePage={activePage}
           />
         </div>
         
-        {activeTab === 0 && <TopicOverview topicId={topicId} topicData={data.data()} />}
-        {activeTab === 1 && <TopicObjectives topicId={topicId} />}
-        {activeTab === 2 && <FieldReports topicId={topicId}/>}
-        {activeTab === 3 && <TopicQuestions topicId={topicId} />}
+        {activePage === 0 && <TopicOverview topicId={topicId} topicData={data.data()} />}
+        {activePage === 1 && <TopicObjectives topicId={topicId} />}
+        {activePage === 2 && <FieldReports topicId={topicId}/>}
+        {activePage === 3 && <TopicQuestions topicId={topicId} />}
       </div>
     </>
   );
