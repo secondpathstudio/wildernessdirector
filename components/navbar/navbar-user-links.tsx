@@ -49,7 +49,7 @@ export const NavbarUserLinks: FC = () => {
           </div>
         </nav>
       ) : (
-        <nav>
+        <nav className="flex justify-center">
           <Link href="/login" className={buttonVariants()}>
             Login &rarr;
           </Link>
