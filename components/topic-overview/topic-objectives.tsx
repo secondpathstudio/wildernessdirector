@@ -1,6 +1,6 @@
 'use client';
 import { FC, useState } from "react";
-import { MainNav } from "@/components/dashboard/main-nav";
+import { MainNav } from "@/components/topic-overview/main-nav";
 import {
   Card,
   CardHeader,
