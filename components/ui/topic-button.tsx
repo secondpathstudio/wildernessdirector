@@ -72,7 +72,7 @@ export const TopicButton = ({
       >
           <div className="relative h-[102px] w-[102px]">
           {current && (
-            <div className="absolute -top-6 left-2.5 px-3 py-2.5 border-2 font-bold uppercase text-green-500 bg-white rounded-xl animate-bounce tracking-wide z-10">
+            <div className="absolute -top-6 left-2.5 px-3 py-2.5 border-2 font-bold uppercase text-primary bg-white rounded-xl animate-bounce tracking-wide z-10">
               Start
               <div
                 className="absolute left-1/2 -bottom-2 w-0 h-0 border-x-8 border-x-transparent border-t-8 transform -translate-x-1/2"
@@ -106,7 +106,7 @@ export const TopicButton = ({
                   )}
                 />
               </DuoButton>
-              <div className={`group-hover:visible invisible ${current ? "bg-green-500 text-white" : "bg-gray-300 text-gray-600"} w-max absolute top-8 left-28 rounded-md p-2`}>
+              <div className={`group-hover:visible invisible ${current ? "bg-primary text-white" : "bg-gray-300 text-gray-600"} w-max absolute top-8 left-28 rounded-md p-2`}>
                 <h3 className="text-sm font-bold text-center">{topicName}</h3>
               </div>
             </CircularProgressbarWithChildren>
