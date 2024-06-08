@@ -33,7 +33,10 @@ const ProgressCard = (props: Props) => {
                         {props.topicData.userProgress.find((u: any) => (u.userId === props.auth.currentUser?.uid))?.completedObjectives}
                     </div>
                 ) :
-                    <div className="text-2xl font-bold">0</div>
+                    <div className="text-xl md:text-2xl font-bold flex items-center gap-1">
+                        <span className='md:hidden'><ListChecks /></span>
+                        0
+                    </div>
                 }
             <div className="flex justify-center items-center md:hidden">
                 <CardTitle className="text-sm font-medium text-center">
