@@ -94,9 +94,9 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
             <Card className="col-span-4">
               <CardHeader className="flex flex-row justify-between items-center">
                 <CardTitle>Objectives</CardTitle>
-                <Button className="max-w-fit" onClick={() => setShowCompleted(prev=>!prev)}>
+                <Button variant={`${showCompleted ? "toggleOn" : "toggleOff"}`} className="max-w-fit" onClick={() => setShowCompleted(prev=>!prev)}>
                   {showCompleted ? "Hide Completed" : "Show Completed"}
-                  </Button>
+                </Button>
               </CardHeader>
               <CardContent className="pl-2">
                 {topicObjectivesStatus === "loading" && <p>Loading objectives...</p>}

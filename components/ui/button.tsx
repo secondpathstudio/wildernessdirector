@@ -16,10 +16,12 @@ const buttonVariants = cva(
           "border border-primary border-2 bg-background text-primary hover:text-secondary hover:border-secondary hover:font-semibold",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/10",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        ghost: "hover:bg-accent hover:text-background text-accent",
         link: "text-primary underline-offset-4 hover:underline",
         teal: "bg-teal-700 hover:opacity-90 text-white",
         orange: "bg-orange-700 hover:opacity-90 text-white",
+        toggleOn: "bg-primary text-background hover:bg-primary/90",
+        toggleOff: "bg-primary/10 text-primary/50 hover:text-primary/90",
       },
       size: {
         default: "h-10 px-4 py-2",
