@@ -183,7 +183,7 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
                 </Table>
               </CardContent>
             </Card>
-        <Card className="col-span-3">
+        <Card className="col-span-3 max-h-fit">
         <CardHeader>
             <CardTitle className="pb-2">Objective Creator</CardTitle>
             <CardDescription>{topicData.data()?.topicName}</CardDescription>
