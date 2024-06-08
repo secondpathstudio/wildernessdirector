@@ -17,6 +17,7 @@ export const NavbarUserLinks: FC = () => {
   const userRole = useUserStore((state) => state.role);
   const setUserRole = useUserStore((state) => state.setRole);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (hasEmitted && data) {
@@ -29,6 +30,12 @@ export const NavbarUserLinks: FC = () => {
             setUserRole(doc.data().role);
           }
         });
+
+        if (data.uid) {
+          if (pathname?.includes("/login")) {
+            router.push("/home");
+          }
+        }
     } else {
       console.log("No user data")
     }
