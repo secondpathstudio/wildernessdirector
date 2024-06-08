@@ -1,5 +1,5 @@
 'use client';
-import { FC } from "react";
+import { FC, useState } from "react";
 import { MainNav } from "@/components/dashboard/main-nav";
 import {
   Card,
@@ -29,6 +29,7 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
   const topicObjectivesCollection = collection(firestore, "topics", props.topicId, "objectives");
   const { status: topicObjectivesStatus, data: topicObjectivesData } = useFirestoreCollection(topicObjectivesCollection);
   const userRole = useUserStore((state) => state.role);
+  const [showCompleted, setShowCompleted] = useState(true);
 
   const markObjectiveCompleted = async (objectiveId: string) => {
     if (auth.currentUser === null) {
@@ -88,11 +89,14 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
 
   return (
     <>
-        <div className="flex-1 space-y-4 pt-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-full">
-              <CardHeader>
+        <div className="flex-1 space-y-4 pt-6 w-full">
+          <div className="grid gap-4 grid-cols-1">
+            <Card className="col-span-4">
+              <CardHeader className="flex flex-row justify-between items-center">
                 <CardTitle>Objectives</CardTitle>
+                <Button className="max-w-fit" onClick={() => setShowCompleted(prev=>!prev)}>
+                  {showCompleted ? "Hide Completed" : "Show Completed"}
+                  </Button>
               </CardHeader>
               <CardContent className="pl-2">
                 {topicObjectivesStatus === "loading" && <p>Loading objectives...</p>}
@@ -101,7 +105,7 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                   <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Objective Type</TableHead>
+                      <TableHead>Type</TableHead>
                       <TableHead>Detail</TableHead>
                       <TableHead>Reference</TableHead>
                       <TableHead>Completed</TableHead>
@@ -114,12 +118,18 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                       </TableRow>
                     )
                     :
-                    topicObjectivesData.docs.map((objective: any) => (
+                    topicObjectivesData.docs.map((objective: any) => {
+                      
+                      if (!showCompleted && objective.data().completedBy.find((user:any) => user.userId === auth.currentUser?.uid) !== undefined) {
+                        return;
+                      }
+
+                      return (
                       <Dialog>
                       <TableRow key={objective.id}>
                         <TableCell>{objective.data().objectiveType}</TableCell>
                         <DialogTrigger>
-                          <TableCell>{objective.data().objectiveText}</TableCell>
+                          <TableCell className="text-left truncate max-w-xs">{objective.data().objectiveText}</TableCell>
                         </DialogTrigger>
                         <TableCell>{objective.data().reference ? objective.data().reference : ""}</TableCell>
                         <TableCell className="text-2xl">
@@ -132,20 +142,20 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                           }
                         </TableCell>
                       </TableRow>
-                      <DialogContent className="max-h-screen overflow-scroll">
+                      <DialogContent className="max-h-screen overflow-scroll sm:max-w-[425px] w-11/12 rounded-md">
                         <DialogHeader>
                           <DialogTitle>Objective Details</DialogTitle>
                           <DialogDescription>{objective.data().objectiveText}</DialogDescription>
                           {objective.data().reference && (
                             <>
-                            <DialogTitle>Reading Chapter</DialogTitle>
+                            <DialogTitle className="text-sm">Reading Chapter</DialogTitle>
                             <DialogDescription>{objective.data().reference}</DialogDescription>
                             </>
                           )}
+                          <DialogTitle className="text-sm">Objective Type</DialogTitle>
+                          <DialogDescription>{objective.data().objectiveType}</DialogDescription>
                         </DialogHeader>
                           
-                        <DialogTitle>Objective Type</DialogTitle>
-                        <DialogDescription>{objective.data().objectiveType}</DialogDescription>
                         <DialogFooter>
                         {(objective.data().objectiveType === "Reading" && objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid)) && (
                             <DialogDescription className="italic text-sm font-bold text-primary">
@@ -168,7 +178,8 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
-                    ))}
+                    )}
+                    )}
                   </TableBody>
                 </Table>
                 )}
