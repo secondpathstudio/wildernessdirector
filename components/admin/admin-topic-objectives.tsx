@@ -1,10 +1,6 @@
 'use client';
 import { FC, useState } from "react";
-import { MainNav } from "@/components/dashboard/main-nav";
-import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
-import { collection, orderBy, query, where } from "firebase/firestore";
 import { AdminObjectiveCreator } from "./admin-objective-creator";
-import { Button } from "../ui/button";
 import { useSearchParams } from "next/navigation";
 
 

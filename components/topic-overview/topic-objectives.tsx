@@ -10,7 +10,7 @@ import {
   LinkCard,
 } from "@/components/ui/card";
 import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc, useFirestoreDocData } from "reactfire";
-import { Timestamp, collection, doc, query, setDoc } from "firebase/firestore";
+import { Timestamp, collection, doc, orderBy, query, setDoc } from "firebase/firestore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
@@ -29,7 +29,10 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
   const topicDoc = doc(firestore, "topics", props.topicId);
   const { status, data: topicData } = useFirestoreDoc(topicDoc);
   const topicObjectivesCollection = collection(firestore, "topics", props.topicId, "objectives");
-  const { status: topicObjectivesStatus, data: topicObjectivesData } = useFirestoreCollection(topicObjectivesCollection);
+  const topicObjectivesQuery = query(topicObjectivesCollection,
+    orderBy("reference", "asc"),
+  );
+  const { status: topicObjectivesStatus, data: topicObjectivesData } = useFirestoreCollection(topicObjectivesQuery);
   const userRole = useUserStore((state) => state.role);
   const [showCompleted, setShowCompleted] = useState(true);
 

@@ -1,6 +1,5 @@
 'use client';
 import { FC, useState } from "react";
-import { MainNav } from "@/components/dashboard/main-nav";
 import {
   Card,
   CardHeader,
@@ -9,24 +8,6 @@ import {
   CardDescription,
   LinkCard,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, orderBy, query, where } from "firebase/firestore";
 import Link from "next/link";

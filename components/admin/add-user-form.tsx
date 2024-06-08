@@ -1,9 +1,7 @@
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '@radix-ui/react-select'
 import React from 'react'
 import { Button } from '../ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/card'
 import { Input } from '../ui/input'
-import { Textarea } from '../ui/textarea'
 
 type Props = {}
 

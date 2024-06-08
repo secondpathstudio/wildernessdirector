@@ -9,8 +9,6 @@ import {
   LinkCard,
 } from "@/components/ui/card";
 import { useAuth, useFirestore, useFirestoreCollectionData, useFirestoreDoc } from "reactfire";
-import { collection, doc, query, where } from "firebase/firestore";
-import Link from "next/link";
 import { AdminUserOverview } from "./admin-user-overview";
 
 interface AdminOverviewProps {
