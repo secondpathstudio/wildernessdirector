@@ -18,7 +18,7 @@
     --primary-foreground: 210 40% 98%;
  
     --secondary: 88 38% 15%;
-    --secondary-foreground: 88 38% 23%
+    --secondary-foreground: 88 38% 23%;
  
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
@@ -75,4 +75,23 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.fc .fc-button-primary { 
+  background-color: #606c37;
+  border-color: #606c37;
+  color: #FEFAE1;
+}
+
+.fc .fc-button-primary:hover {
+  background-color: #606c37;
+  border-color: #606c37;
+  color: #FEFAE1;
+  opacity: 0.9;
+}
+
+.fc:active .fc-button-primary:active {
+  background-color: #273518;
+  border-color: #273518;
+  color: #FEFAE1;
 }
