@@ -73,7 +73,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
         <div className="flex-1 space-y-4 pt-6">
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-4">
-              <CardHeader>
+              <CardHeader> 
                 <CardTitle>Field Reports</CardTitle>
               </CardHeader>
               <CardContent className="pl-2">
@@ -108,7 +108,7 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                           <TableCell>{report.activity}</TableCell>
                           <TableCell>{report.images?.length > 0 ? <Camera /> : ""}</TableCell>
                         </TableRow>
-                        <DialogContent className="max-h-screen overflow-scroll">
+                        <DialogContent className="max-h-screen overflow-scroll sm:max-w-[425px] w-11/12 rounded-md">
                           <DialogHeader>
                             <DialogTitle>Field Report</DialogTitle>
                             <DialogDescription>{report.reportTitle}</DialogDescription>

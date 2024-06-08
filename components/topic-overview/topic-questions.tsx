@@ -102,7 +102,7 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
                           <TableCell>{question.questionType}</TableCell>
                           <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleQuestionDelete(question.id)}>Delete</TableCell>
                         </TableRow>
-                        <DialogContent>
+                        <DialogContent className=" sm:max-w-[425px] w-11/12 rounded-md">
                           <DialogHeader>
                             <DialogTitle>Question</DialogTitle>
                             <DialogDescription>{question.questionText}</DialogDescription>
@@ -125,10 +125,12 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
                                 <DialogDescription>{question.answer.toString()}</DialogDescription>
                               </DialogHeader>
                             )}
-                          <DialogTitle>Explanation</DialogTitle>
-                          <DialogDescription>{question.explanation}</DialogDescription>
-                          <DialogTitle>Reference</DialogTitle>
+                          <DialogHeader>
+                            <DialogTitle>Explanation</DialogTitle>
+                            <DialogDescription>{question.explanation}</DialogDescription>
+                            <DialogTitle>Reference</DialogTitle>
                             <DialogDescription>{question.reference}</DialogDescription>
+                          </DialogHeader>
                           <DialogFooter>
                             <DialogDescription className="italic text-sm opacity-30">Created on {question.createdAt.toDate().toLocaleDateString()}</DialogDescription>
                           </DialogFooter>
