@@ -96,7 +96,10 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
             <Card className="col-span-4">
               <CardHeader className="flex flex-row justify-between items-center">
                 <CardTitle>Objectives</CardTitle>
-                <CheckmarkButton toggleOn={showCompleted} onClick={() => setShowCompleted(prev=>!prev)}/>
+                <div className="flex items-center gap-3">
+                  <CardDescription className="hidden md:flex">{showCompleted ? "Hide" : "Show"} Completed</CardDescription>
+                  <CheckmarkButton toggleOn={showCompleted} onClick={() => setShowCompleted(prev=>!prev)}/>
+                </div>
               </CardHeader>
               <CardContent className="pl-2">
                 {topicObjectivesStatus === "loading" && <p>Loading objectives...</p>}
@@ -109,7 +112,6 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                       <TableHead>Detail</TableHead>
                       <TableHead>Ref</TableHead>
                       <TableHead className={`${showCompleted ? '' : 'hidden'}`}>
-                        <span className="sr-only">Completed</span>
                         <Check />
                       </TableHead>
                     </TableRow>
