@@ -16,6 +16,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "../ui/button";
 import { useUserStore } from "@/lib/store";
 import { toast } from "../ui/use-toast";
+import { Axe, Book, Check } from "lucide-react";
+import CheckmarkButton from "../ui/checkmark-button";
 
 interface TopicObjectivesProps {
   topicId: string;
@@ -94,9 +96,7 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
             <Card className="col-span-4">
               <CardHeader className="flex flex-row justify-between items-center">
                 <CardTitle>Objectives</CardTitle>
-                <Button variant={`${showCompleted ? "toggleOn" : "toggleOff"}`} className="max-w-fit" onClick={() => setShowCompleted(prev=>!prev)}>
-                  {showCompleted ? "Hide Completed" : "Show Completed"}
-                </Button>
+                <CheckmarkButton toggleOn={showCompleted} onClick={() => setShowCompleted(prev=>!prev)}/>
               </CardHeader>
               <CardContent className="pl-2">
                 {topicObjectivesStatus === "loading" && <p>Loading objectives...</p>}
@@ -107,8 +107,11 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                     <TableRow>
                       <TableHead>Type</TableHead>
                       <TableHead>Detail</TableHead>
-                      <TableHead>Reference</TableHead>
-                      <TableHead>Completed</TableHead>
+                      <TableHead>Ref</TableHead>
+                      <TableHead className={`${showCompleted ? '' : 'hidden'}`}>
+                        <span className="sr-only">Completed</span>
+                        <Check />
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -124,18 +127,22 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                         return;
                       }
 
+
+                      //TODO: vertical align the row content
                       return (
                       <Dialog>
                       <TableRow key={objective.id}>
-                        <TableCell>{objective.data().objectiveType}</TableCell>
+                        <TableCell className="text-primary">
+                          {objective.data().objectiveType === "Reading" ? <Book /> : <Axe />}
+                        </TableCell>
                         <DialogTrigger>
-                          <TableCell className="text-left truncate max-w-xs">{objective.data().objectiveText}</TableCell>
+                          <TableCell className="truncate max-w-[100px] sm:max-w-[250px] md:max-w-[500px] lg:max-w-[700px] xl:max-w-full">{objective.data().objectiveText}</TableCell>
                         </DialogTrigger>
                         <TableCell>{objective.data().reference ? objective.data().reference : ""}</TableCell>
-                        <TableCell className="text-2xl">
+                        <TableCell>
                           {
                             objective.data().completedBy.find((user:any) => user.userId === auth.currentUser?.uid) !== undefined ? (
-                              <span>✅</span>
+                              <span className="text-primary"><Check size={25}/></span>
                             ) : (
                               <span></span>
                             )
