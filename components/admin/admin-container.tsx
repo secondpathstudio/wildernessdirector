@@ -1,6 +1,6 @@
 'use client';
 import { FC, useState } from "react";
-import { MainNav } from "@/components/dashboard/main-nav";
+import { MainNav } from "@/components/topic-overview/main-nav";
 import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc, useUser } from "reactfire";
 import { AdminOverview } from "./admin-overview";
 import { AdminFieldReports } from "./admin-field-reports";
