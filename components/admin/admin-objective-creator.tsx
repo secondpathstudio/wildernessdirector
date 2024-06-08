@@ -1,6 +1,6 @@
 'use client';
 import { FC, useState } from "react";
-import { MainNav } from "@/components/dashboard/main-nav";
+import { MainNav } from "@/components/topic-overview/main-nav";
 import {
   Card,
   CardHeader,
@@ -13,11 +13,12 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc } from "reactfire";
+import { useAuth, useFirestore, useFirestoreCollection, useFirestoreCollectionData, useFirestoreDoc } from "reactfire";
 import { toast } from "../ui/use-toast";
 import { Timestamp, addDoc, collection, deleteDoc, doc, query, setDoc, orderBy } from "firebase/firestore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import AdminObjectiveDialog from "./admin-objective-dialog";
 
 interface AdminObjectiveCreatorProps {
     topicId: string;
@@ -31,7 +32,9 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
   const topicObjectivesQuery = query(topicObjectivesCollection,
     orderBy("reference", "asc"),
   );
-  const { status: topicObjectivesStatus, data: topicObjectives } = useFirestoreCollection(topicObjectivesQuery);
+  const { status: topicObjectivesStatus, data: topicObjectives } = useFirestoreCollectionData(topicObjectivesQuery,
+    { idField: "id" }
+  );
   const { status, data: topicData } = useFirestoreDoc(topicDoc);
   const [isLoading, setIsLoading] = useState(false);
   const [newObjective, setNewObjective] = useState({
@@ -142,41 +145,27 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(topicObjectives === null || topicObjectives === undefined || topicObjectives.docs.length === 0) ? (
+                    {(topicObjectives === null || topicObjectives === undefined || topicObjectives.length === 0) ? (
                       <TableRow>
                         <TableCell colSpan={3}>No objectives found</TableCell>
                       </TableRow>
                     )
                     :
-                    topicObjectives.docs.map((topicObjective: any) => (
+                    topicObjectives.map((topicObjective: any) => (
                       <Dialog>
                         <TableRow key={topicObjective.id}>
-                          <TableCell>{topicObjective.data().objectiveType}</TableCell>
+                          <TableCell>{topicObjective.objectiveType}</TableCell>
                           <DialogTrigger>
-                            <TableCell>{topicObjective.data().objectiveText}</TableCell>
+                            <TableCell>{topicObjective.objectiveText}</TableCell>
                           </DialogTrigger>
-                          <TableCell>{topicObjective.data().reference ? topicObjective.data().reference : ""}</TableCell>
+                          <TableCell>{topicObjective.reference ? topicObjective.reference : ""}</TableCell>
                           {/* <TableCell className="hover:cursor-pointer hover:bg-red-500" onClick={() => handleObjectiveDelete(index)}>Delete</TableCell> */}
                         </TableRow>
-                        <DialogContent className="max-h-screen overflow-scroll">
-                          <DialogHeader>
-                            <DialogTitle>Objective Details</DialogTitle>
-                            <DialogDescription>{topicObjective.data().objectiveText}</DialogDescription>
-                            {topicObjective.data().reference && (
-                              <>
-                              <DialogTitle>Reference</DialogTitle>
-                              <DialogDescription>{topicObjective.data().reference}</DialogDescription>
-                              </>
-                            )}
-                          </DialogHeader>
-                            
-                          <DialogTitle>Objective Type</DialogTitle>
-                          <DialogDescription>{topicObjective.data().objectiveType}</DialogDescription>
-                          <DialogFooter>
-                            <Button onClick={() => handleObjectiveDelete(topicObjective.id)}>Delete</Button>
-                            <DialogDescription className="italic text-sm opacity-30">Created on {topicObjective.data().createdAt.toDate().toLocaleDateString()}</DialogDescription>
-                          </DialogFooter>
-                        </DialogContent>
+                        <AdminObjectiveDialog 
+                          topicObjective={topicObjective}
+                          handleObjectiveDelete={handleObjectiveDelete}
+                          closeDialog={() => {}}
+                        />
                       </Dialog>
                     ))}
                   </TableBody>
