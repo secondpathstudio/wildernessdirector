@@ -1,7 +1,7 @@
 'use client';
 import { FC, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { MainNav } from "@/components/dashboard/main-nav";
+import { MainNav } from "@/components/topic-overview/main-nav";
 import { useFirestore, useFirestoreDoc } from "reactfire";
 import { doc } from "firebase/firestore";
 import { TopicOverview } from "./topic-overview";

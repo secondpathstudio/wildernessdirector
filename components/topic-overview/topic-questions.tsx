@@ -90,9 +90,8 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
                     )
                     :
                     questions.map((question: any) => (
-                      <Dialog>
-                        
-                        <TableRow key={question.id}>
+                      <Dialog key={question.id}>
+                        <TableRow>
                           <TableCell>{question.createdAt.toDate().toLocaleDateString()}</TableCell>
                           <TableCell>
                             <DialogTrigger>
