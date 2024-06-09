@@ -58,6 +58,7 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
       } else {
         completedByArray.push({
           userId: auth.currentUser?.uid,
+          userName: auth.currentUser?.displayName,
           completedAt: Timestamp.now(),
         });
       }
@@ -80,6 +81,7 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
     } else {
       topicProgress.push({
         userId: auth.currentUser?.uid,
+        userName: auth.currentUser?.displayName,
         completedObjectives: 1,
         lastUpdated: Timestamp.now(),
       });
