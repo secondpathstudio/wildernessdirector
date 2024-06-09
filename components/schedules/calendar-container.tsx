@@ -54,7 +54,11 @@ export const CalendarContainer: FC = () => {
   const handleChangeMonth = (newDate: Date) => {
     const newMonthNumber = getAcademicMonthNumber(newDate.getMonth());
     setCurrentMonth(newMonthNumber);
-    console.log(newMonthNumber)
+    setNewEvent({
+      ...newEvent,
+      startDate: newDate,
+      endDate: newDate,
+    });
   }
 
   const handleAddEvent = async () => {
@@ -196,7 +200,7 @@ export const CalendarContainer: FC = () => {
                 <div className="grid grid-cols-4 items-center gap-4">
                   <DatePickerDialog 
                     onSelect={(dateRange: DateRange | undefined) => {handleNewEvent(dateRange)}}
-                    selectedDate={new Date()} />
+                    selectedDate={newEvent.startDate} />
 
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
