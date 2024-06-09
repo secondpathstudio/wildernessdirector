@@ -19,7 +19,6 @@ export const AdminContainer: FC = () => {
   const [currentUserId, setCurrentUserId] = useState<string | undefined>("");
   const firestore = useFirestore();
   const usersCollection = collection(firestore, "users");
-  //TODO check for isAdmin = false or undefined
   const usersQuery = query(usersCollection);
   const { status: usersStatus, data: users } = useFirestoreCollection(usersQuery, {
     idField: 'id',
