@@ -230,7 +230,7 @@ export const CalendarContainer: FC = () => {
         <div className="flex flex-col gap-4 h-full">
           <ScheduleCalendar 
             topicNumber={currentMonth} 
-            events={schedules?.find((s: any) => s.month === currentMonth)?.events || []} 
+            events={schedules?.map((s: any) => s.events).flat() || []} 
             handleChangeMonth={handleChangeMonth}
             handleEventDelete={handleEventDelete}
             />
