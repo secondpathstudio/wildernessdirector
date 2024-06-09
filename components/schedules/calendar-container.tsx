@@ -89,8 +89,8 @@ export const CalendarContainer: FC = () => {
         events: [{
           title: newEvent.title,
           description: newEvent.description,
-          start: newEvent.startDate.toISOString().slice(0, 10),
-          end: newEvent.endDate.toISOString().slice(0, 10),
+          start: newEvent.startDate.toISOString().slice(0, 10) + " 00:00:00",
+          end: newEvent.endDate.toISOString().slice(0, 10) + " 23:00:00",
           startDate: Timestamp.fromDate(newEvent.startDate),
           endDate: Timestamp.fromDate(newEvent.endDate),
           createdBy: {
@@ -114,8 +114,8 @@ export const CalendarContainer: FC = () => {
     newEvents.push({
       title: newEvent.title,
       description: newEvent.description,
-      start: newEvent.startDate.toISOString().slice(0, 10),
-      end: newEvent.endDate.toISOString().slice(0, 10),
+      start: newEvent.startDate.toISOString().slice(0, 10) + " 00:00:00",
+      end: newEvent.endDate.toISOString().slice(0, 10) + " 23:00:00",
       startDate: Timestamp.fromDate(newEvent.startDate),
       endDate: Timestamp.fromDate(newEvent.endDate),
       createdBy: auth.currentUser?.uid,
