@@ -67,6 +67,11 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
         return;
     }
 
+    //make sure objective reference has 3 characters
+    if (newObjective.reference.length < 3) {
+      newObjective.reference = newObjective.reference.padStart(3, "0");
+    }
+
     //add objective to sub-collection
     try {
       const topicObjectivesCollection = collection(firestore, "topics", props.topicId, "objectives");

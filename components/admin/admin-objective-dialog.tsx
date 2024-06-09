@@ -23,6 +23,11 @@ const AdminObjectiveDialog = (props: Props) => {
     const handleSaveEdits = async () => {
         // save editedObjective to firestore
 
+        //check for reference length
+        if (editedObjective.reference.length < 3) {
+            editedObjective.reference = editedObjective.reference.padStart(3, '0')
+        }
+
         setIsUpdating(true)
         const updatedObjective = {
             ...editedObjective,
@@ -35,6 +40,8 @@ const AdminObjectiveDialog = (props: Props) => {
         } catch (error) {
             console.error(error)
         }
+
+        setEditedObjective(props.topicObjective)
 
         setIsUpdating(false)
         setIsEditing(false)
@@ -56,7 +63,10 @@ const AdminObjectiveDialog = (props: Props) => {
         <DialogTitle>Objective Type</DialogTitle>
         <DialogDescription>{props.topicObjective.objectiveType}</DialogDescription>
         <DialogFooter>
-            <Button onClick={() => setIsEditing(true)}>Edit</Button>
+            <Button onClick={() => {
+                setIsEditing(true)
+                setEditedObjective(props.topicObjective)
+                }}>Edit</Button>
             <Button onClick={() => props.handleObjectiveDelete(props.topicObjective.id)}>Delete</Button>
         <DialogDescription className="italic text-sm opacity-30">Created on {props.topicObjective.createdAt.toDate().toLocaleDateString()}</DialogDescription>
         </DialogFooter>
