@@ -27,6 +27,14 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
             <Card className="col-span-7">
               <CardHeader>
                 <CardTitle>Overview for {props.users?.find((user: any) => user.id === props.userId)?.data()?.name}</CardTitle>
+                {props.users?.find((user: any) => user.id === props.userId) && (
+                  <CardDescription>
+                    {props.users?.find((user: any) => user.id === props.userId)?.data()?.role ? 
+                    `Role: ${props.users?.find((user: any) => user.id === props.userId)?.data()?.role}` :
+                    "Role: free"
+                    }
+                  </CardDescription>
+                )}
               </CardHeader>
               <CardContent className="pl-2">
                 {props.users?.find((user: any) => user.id === props.userId) ? (
