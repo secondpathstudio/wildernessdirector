@@ -5,7 +5,6 @@ import { Check, Crown, Star, TreePine } from "lucide-react";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 import "react-circular-progressbar/dist/styles.css";
 import { DuoButton } from "./button-duo";
@@ -91,7 +90,7 @@ export const TopicButton = ({
               value={Number.isNaN(percentage) ? 0 : percentage}
               styles={{
                 path: {
-                  stroke: "#4ade80",
+                  stroke: "hsl(74, 32%, 32%)",
                 },
                 trail: {
                   stroke: "#e5e7eb",
