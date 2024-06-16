@@ -23,7 +23,7 @@ const HeroPath = (props: Props) => {
     }, []);
 
     const strokeDasharray = pathRef.current ? pathRef.current.getTotalLength() : 0;
-    const strokeDashoffset = ((100 - progress) / 100) * strokeDasharray;
+    const strokeDashoffset = Math.min(Math.max(((100 - progress) / 100), 0), 100) * strokeDasharray;
   
 
   return (
