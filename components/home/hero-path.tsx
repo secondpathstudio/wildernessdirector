@@ -27,15 +27,15 @@ const HeroPath = (props: Props) => {
   
 
   return (
-<div style={{ position: 'relative', height: '400px', width: '200px' }}>
+<div style={{ position: 'relative', height: '400px', width: '200px'}}>
     <DuoButton
         size="rounded"
         variant={"secondary"}
-        className="z-20 h-[70px] w-[70px] border-b-8 absolute top-[30px] left-[65px]"
+        className="z-20 h-[70px] w-[70px] border-b-8 absolute top-[30px] left-[65px] hover:bg-primary hover:cursor-default"
         >
             <TreePine
             className={cn(
-            "h-10 w-10",
+            "h-10 w-10 fill-primary-foreground text-primary-foreground",
             )}
             />
     </DuoButton>
@@ -61,11 +61,11 @@ const HeroPath = (props: Props) => {
       <DuoButton
         size="rounded"
         variant={progress >= 100 ? "secondary" : "locked"}
-        className="z-20 h-[70px] w-[70px] border-b-8 absolute top-[140px] left-[60px]"
+        className="z-20 h-[70px] w-[70px] border-b-8 absolute top-[140px] left-[60px] hover:bg-neutral-200 hover:cursor-default"
         >
             <TreePine
             className={cn(
-            "h-10 w-10",
+            "h-10 w-10 fill-primary-foreground text-primary-foreground",
             )}
             />
     </DuoButton>
@@ -75,11 +75,11 @@ const HeroPath = (props: Props) => {
       <DuoButton
         size="rounded"
         variant={"locked"}
-        className="z-20 h-[70px] w-[70px] border-b-8 absolute top-[260px] left-[65px]"
+        className="z-20 h-[70px] w-[70px] border-b-8 absolute top-[260px] left-[65px] hover:bg-neutral-200 hover:cursor-default"
         >
             <TreePine
             className={cn(
-            "h-10 w-10",
+            "h-10 w-10 fill-primary-foreground text-primary-foreground",
             )}
             />
     </DuoButton>
