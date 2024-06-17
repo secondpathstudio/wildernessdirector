@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { DuoButton } from '../ui/button-duo'
 import { cn } from '@/lib/utils'
-import { TreePine } from 'lucide-react'
+import { Check, TreePine } from 'lucide-react'
 import path from 'path'
 
 type Props = {}
@@ -33,11 +33,19 @@ const HeroPath = (props: Props) => {
         variant={"secondary"}
         className="z-20 h-[70px] w-[70px] border-b-8 absolute top-[30px] left-[65px] hover:bg-primary hover:cursor-default"
         >
+          {progress >= 100 ? (
+            <Check 
+            className={cn(
+              "h-10 w-10 text-primary-foreground",
+              )}
+            />  
+          ) : (
             <TreePine
             className={cn(
             "h-10 w-10 fill-primary-foreground text-primary-foreground",
             )}
             />
+          )}
     </DuoButton>
       <svg style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%' }}>
         {/* Background Path */}
