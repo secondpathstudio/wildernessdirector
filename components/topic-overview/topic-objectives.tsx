@@ -136,8 +136,8 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
 
                       //TODO: vertical align the row content
                       return (
-                      <Dialog>
-                      <TableRow key={objective.id}>
+                      <Dialog key={objective.id}>
+                      <TableRow>
                         <TableCell className="text-primary">
                           {objective.data().objectiveType === "Reading" ? <Book /> : <Axe />}
                         </TableCell>
