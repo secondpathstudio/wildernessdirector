@@ -52,7 +52,7 @@ const HeroPath = (props: Props) => {
             ref={pathRef}
             d="M 100 70 Q 110 110 100 150" 
             stroke={`hsl(${progress} 38% 15%)`} 
-            stroke-width="8" 
+            strokeWidth="8" 
             fill="none"
             strokeDasharray={strokeDasharray}
             strokeDashoffset={strokeDashoffset}
@@ -60,8 +60,8 @@ const HeroPath = (props: Props) => {
       </svg>
       <DuoButton
         size="rounded"
-        variant={progress >= 100 ? "secondary" : "locked"}
         className="z-20 h-[70px] w-[70px] border-b-8 absolute top-[140px] left-[60px] hover:bg-neutral-200 hover:cursor-default"
+        variant={progress >= 100 ? "secondary" : "locked"}
         >
             <TreePine
             className={cn(
@@ -74,8 +74,8 @@ const HeroPath = (props: Props) => {
       </svg>
       <DuoButton
         size="rounded"
-        variant={"locked"}
         className="z-20 h-[70px] w-[70px] border-b-8 absolute top-[260px] left-[65px] hover:bg-neutral-200 hover:cursor-default"
+        variant={"locked"}
         >
             <TreePine
             className={cn(
