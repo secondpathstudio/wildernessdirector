@@ -31,6 +31,7 @@ export const CreateMCQuestionForm: FC<QuestionFormProps> = (props) => {
     reference: "",
     explanation: "",
     topicId: props.topicId ? props.topicId : "unknownTopicId",
+    approved: false,
   })
   const userRole = useUserStore((state) => state.role);
 
@@ -86,6 +87,7 @@ export const CreateMCQuestionForm: FC<QuestionFormProps> = (props) => {
       reference: "",
       explanation: "",
       topicId: props.topicId ? props.topicId : "unknownTopicId",
+      approved: false,
     });
 
     setIsLoading(false);

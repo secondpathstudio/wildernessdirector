@@ -28,6 +28,7 @@ export const CreateTFQuestionForm: FC<QuestionFormProps> = (props) => {
     reference: "",
     explanation: "",
     topicId: props.topicId ? props.topicId : "unknownTopicId",
+    approved: false,
   });
   const userRole = useUserStore((state) => state.role);
 
@@ -78,6 +79,7 @@ export const CreateTFQuestionForm: FC<QuestionFormProps> = (props) => {
       reference: "",
       explanation: "",
       topicId: props.topicId ? props.topicId : "unknownTopicId",
+      approved: false,
     });
 
     setIsLoading(false);
