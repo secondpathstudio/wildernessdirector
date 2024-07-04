@@ -27,7 +27,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
-import { collection, deleteDoc, doc, orderBy, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, orderBy, query, updateDoc, where } from "firebase/firestore";
+import { useUserStore } from "@/lib/store";
+import { Button } from "../ui/button";
 
 //create props to accept topicId string
 interface AdminQuestionsProps {
@@ -37,6 +39,7 @@ interface AdminQuestionsProps {
 
 export const AdminTopicQuestions: FC<AdminQuestionsProps> = (props) => {
   const auth = useAuth();
+  const userRole = useUserStore((state) => state.role);
   const firestore = useFirestore();
   const questionsCollection = collection(firestore, "questions");
   const [isAscending, setIsAscending] = useState(false);
@@ -51,6 +54,16 @@ export const AdminTopicQuestions: FC<AdminQuestionsProps> = (props) => {
       await deleteDoc(doc(questionsCollection, questionId));
     } catch (error : any) {
       console.error(error);
+    }
+  }
+
+  const handleQuestionApprove = async (questionId: string) => {
+    try {
+      await updateDoc(doc(questionsCollection, questionId), {
+        approved: true,
+      });
+    } catch (error : any) {
+      console.error(error)
     }
   }
 
@@ -131,6 +144,15 @@ export const AdminTopicQuestions: FC<AdminQuestionsProps> = (props) => {
                           <DialogFooter>
                             <DialogDescription className="italic text-sm opacity-30">Created on {question.createdAt.toDate().toLocaleDateString()}</DialogDescription>
                           </DialogFooter>
+                          {userRole === 'admin' && (
+                            <Button 
+                              type="button" 
+                              onClick={() => handleQuestionApprove(question.id)}
+                              disabled={question.approved}
+                              >
+                                {question.approved ? "Approved ✅" : "Approve"}
+                              </Button>
+                          )}
                         </DialogContent>
                       </Dialog>
                     ))}

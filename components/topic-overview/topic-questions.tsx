@@ -28,7 +28,9 @@ import {
 } from "@/components/ui/dialog"
 import { QuestionCreator } from "./question-creator";
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
-import { collection, deleteDoc, doc, orderBy, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, orderBy, query, updateDoc, where } from "firebase/firestore";
+import { useUserStore } from "@/lib/store";
+import { Button } from "../ui/button";
 
 //create props to accept topicId string
 interface TopicQuestionsProps {
@@ -38,6 +40,7 @@ interface TopicQuestionsProps {
 
 export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
   const auth = useAuth();
+  const userRole = useUserStore((state) => state.role);
   const firestore = useFirestore();
   const questionsCollection = collection(firestore, "questions");
   const [isAscending, setIsAscending] = useState(false);

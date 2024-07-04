@@ -87,7 +87,7 @@ export const Dashboard: FC = () => {
               if (userProgress !== undefined) {
                 progress = Math.round((userProgress.completedObjectives / topic.data().objectiveCount) * 100);
 
-                if (progress >= 100) {
+                if (progress >= 100 && userProgress.approvedQuestions > 10) {
                   isLocked = false;
                 }
               }
