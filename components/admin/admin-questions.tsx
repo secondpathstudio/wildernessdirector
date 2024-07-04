@@ -27,13 +27,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
-import { collection, deleteDoc, doc, orderBy, query, updateDoc, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, increment, orderBy, query, updateDoc, where } from "firebase/firestore";
 import { useUserStore } from "@/lib/store";
 import { Button } from "../ui/button";
 
 //create props to accept topicId string
 interface AdminQuestionsProps {
-
+  userId: string | undefined;
 }
 
 
@@ -42,9 +42,12 @@ export const AdminTopicQuestions: FC<AdminQuestionsProps> = (props) => {
   const userRole = useUserStore((state) => state.role);
   const firestore = useFirestore();
   const questionsCollection = collection(firestore, "questions");
+  const topicsCollection = collection(firestore, "topics");
   const [isAscending, setIsAscending] = useState(false);
   const questionsQuery = query(questionsCollection, 
-    orderBy('createdAt', isAscending ? 'asc' : 'desc'));
+    orderBy('createdAt', isAscending ? 'asc' : 'desc'),
+    where('authorId', '==', props.userId),
+  );
   const { status, data: questions } = useFirestoreCollectionData(questionsQuery, {
     idField: 'id',
   });
@@ -57,13 +60,57 @@ export const AdminTopicQuestions: FC<AdminQuestionsProps> = (props) => {
     }
   }
 
-  const handleQuestionApprove = async (questionId: string) => {
+  const handleQuestionApprove = async (
+    questionId: string,
+    topicId: string,
+    authorId: string
+  ) => {
+    //update question to approved
     try {
       await updateDoc(doc(questionsCollection, questionId), {
         approved: true,
       });
     } catch (error : any) {
       console.error(error)
+    }
+
+    //increment approved question count for topic
+    const topicDoc = doc(topicsCollection, topicId);
+    let newUserProgressArray: any[] = [];
+    try {
+      await getDoc(topicDoc).then((doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          if (data) {
+            let userProgressArray = data.userProgress;
+            if (userProgressArray.length > 0) {
+              newUserProgressArray = userProgressArray.map((user: any) => {
+                if (user.userId === authorId) {
+                  console.log('found user', user);
+                  const currentApprovedQuestionCount = user.approvedQuestionCount ? user.approvedQuestionCount : 0;
+                  return {
+                    ...user,
+                    approvedQuestionCount: currentApprovedQuestionCount + 1,
+                    lastUpdated: new Date(),
+                  }
+                } else {
+                  return {
+                    ...user,
+                    lastUpdated: new Date(),
+                  }
+                }
+              });
+
+              console.log('userProgressArray', newUserProgressArray)
+              updateDoc(topicDoc, {
+                userProgress: newUserProgressArray,
+              });
+            }
+          }
+        }
+      });
+    } catch (error : any) {
+      console.error(error);
     }
   }
 
@@ -147,7 +194,7 @@ export const AdminTopicQuestions: FC<AdminQuestionsProps> = (props) => {
                           {userRole === 'admin' && (
                             <Button 
                               type="button" 
-                              onClick={() => handleQuestionApprove(question.id)}
+                              onClick={() => handleQuestionApprove(question.id, question.topicId, question.authorId)}
                               disabled={question.approved}
                               >
                                 {question.approved ? "Approved ✅" : "Approve"}

@@ -74,7 +74,7 @@ export const AdminContainer: FC = () => {
         {activePage === 0 && <AdminOverview userId={currentUserId} users={users?.docs}/>}
         {activePage === 1 && <AdminTopics />}
         {activePage === 2 && <AdminFieldReports />}
-        {activePage === 3 && <AdminTopicQuestions />}
+        {activePage === 3 && <AdminTopicQuestions userId={currentUserId} />}
         
       </div>
     </>

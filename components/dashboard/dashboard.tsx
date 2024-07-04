@@ -1,7 +1,7 @@
 'use client';
 
 import { FC, useEffect, useState } from "react";
-import { getDocs, collection, query, orderBy, doc } from "firebase/firestore";
+import { getDocs, collection, query, orderBy, doc, where } from "firebase/firestore";
 import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc } from "reactfire";
 import {
   Card,
