@@ -20,7 +20,7 @@ const ProgressCard = (props: Props) => {
             {props.titleText}
             {props.titleText === "Objectives Completed" && (<ListChecks />)}
             {props.titleText === "Field Reports" && (<BookOpen />)}
-            {props.titleText === "Questions Submitted" && (<FileQuestion />)}
+            {props.titleText === "Questions Approved" && (<FileQuestion />)}
         </CardTitle>
         </CardHeader>
         {props.titleText === "Objectives Completed" && (
@@ -81,7 +81,7 @@ const ProgressCard = (props: Props) => {
                     <span className="md:hidden">
                         <FileQuestion />
                     </span>
-                    {props.questions.length}
+                    {props.questions.filter((q: any) => q.approved).length} <span className='text-sm font-medium'>({props.questions.length - props.questions.filter((q: any) => q.approved).length} pending)</span>
                 </div>
             )}
             <div className="flex justify-center items-center md:hidden">

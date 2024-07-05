@@ -62,7 +62,7 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
           <ProgressCard 
             topicData={props.topicData} 
             auth={auth} 
-            titleText="Questions Submitted" 
+            titleText="Questions Approved" 
             questionStatus={questionStatus}
             questions={questions}
           />

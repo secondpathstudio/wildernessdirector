@@ -80,6 +80,7 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
                   <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Approved</TableHead>
                       <TableHead className="">Date Added</TableHead>
                       <TableHead>Question Text</TableHead>
                       <TableHead>Type</TableHead>
@@ -95,6 +96,7 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
                     questions.map((question: any) => (
                       <Dialog key={question.id}>
                         <TableRow>
+                          <TableCell>{question.approved ? "✅" : "🚫"}</TableCell>
                           <TableCell>{question.createdAt.toDate().toLocaleDateString()}</TableCell>
                           <TableCell>
                             <DialogTrigger>
