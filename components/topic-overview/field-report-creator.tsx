@@ -67,7 +67,7 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
       const newReportRef = await addDoc(fieldReportsCollection, {
         ...fieldReport,
         authorId: auth.currentUser.uid,
-        authorName: auth.currentUser.displayName || "NoName",
+        authorName: auth.currentUser.displayName || auth.currentUser.email,
         createdAt: Timestamp.now(),
       });
       toast({
@@ -122,11 +122,15 @@ export const FieldReportCreator: FC<FieldReportCreatorProps> = (props) => {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="SAR">Search and Rescue</SelectItem>
               <SelectItem value="Didactics">Didactics</SelectItem>
-              <SelectItem value="Diving">Diving</SelectItem>
-              <SelectItem value="Hiking">Hiking</SelectItem>
               <SelectItem value="Camping">Camping</SelectItem>
+              <SelectItem value="SAR">Search and Rescue</SelectItem>
+              <SelectItem value="Diving">Diving</SelectItem>
+              <SelectItem value="Cycling">Cycling</SelectItem>
+              <SelectItem value="Running">Running</SelectItem>
+              <SelectItem value="Ski/Snowboard">Ski/Snowboard</SelectItem>
+              <SelectItem value="Hiking">Hiking</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
