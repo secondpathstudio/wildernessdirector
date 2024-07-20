@@ -86,7 +86,7 @@ export default function ImageUploader(props: any) {
     setLoading(true);
     const fileToUpload = image;
     const fileName = fileToUpload.name;
-    const storageRef = ref(storage, `images/${auth.currentUser.uid}/${fileName}-${Timestamp.now().toString()}`);
+    const storageRef = ref(storage, `images/${auth.currentUser.uid}/${fileName}-${Timestamp.now().toDate().toISOString()}`);
     
     //TODO upload image to firebase storage
     try {
