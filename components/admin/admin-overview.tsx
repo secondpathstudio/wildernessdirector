@@ -52,10 +52,9 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-7">
               <CardHeader>
-                <CardTitle>Overview for {props.users?.find((user: any) => user.id === props.userId)?.data()?.name != "" ? 
-                props.users?.find((user: any) => user.id === props.userId)?.data()?.name 
-              :
-              props.users?.find((user: any) => user.id === props.userId)?.data()?.email}</CardTitle>
+                <CardTitle>Overview for {props.users?.find((user: any) => user.id === props.userId)?.data()?.email}/ 
+                {props.users?.find((user: any) => user.id === props.userId)?.data()?.name} 
+              </CardTitle>
                 {props.userId !== undefined && (
                 <div className="flex items-center">
                   <Select 
