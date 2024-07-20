@@ -53,7 +53,9 @@ export const AdminContainer: FC = () => {
                 <SelectGroup>
                   <SelectItem value="All">All Users</SelectItem>
                   {users.docs.map((user: any) => (
-                    <SelectItem key={user.id} value={user.id}>{user.data().name} - {user.data().email}</SelectItem>
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.data().name != "" ? user.data().name : user.data().email}
+                    </SelectItem>
                   ))}
                 </SelectGroup>
             </SelectContent>
