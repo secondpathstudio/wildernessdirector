@@ -97,8 +97,8 @@ export const FieldReports: FC<FieldReportsProps> = (props) => {
                     )
                     :
                     fieldReports.map((report: any) => (
-                      <Dialog>
-                        <TableRow key={report.id} className={`${report === editingFieldReport && "bg-primary rounded-lg"}`}>
+                      <Dialog key={report.id}>
+                        <TableRow className={`${report === editingFieldReport && "bg-primary rounded-lg"}`}>
                           <TableCell>{report.activityDate.toDate().toLocaleDateString()}</TableCell>
                           <TableCell>
                             <DialogTrigger>

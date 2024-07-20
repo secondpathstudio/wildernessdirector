@@ -107,7 +107,14 @@ export default function ImageUploader(props: any) {
     }
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { 
+    getRootProps, 
+    getInputProps, 
+    isDragActive, 
+    isDragAccept,
+    isDragReject,
+    open
+   } = useDropzone({ onDrop, noClick: true });
 
   return (
     <Dialog>
@@ -149,7 +156,7 @@ export default function ImageUploader(props: any) {
               )}
 
               {!loading && !uploadedImagePath && (
-                <div className=" text-center">
+                <div className="text-center" onClick={open}>
                   <div className=" border p-2 rounded-md max-w-min mx-auto">
                     <UploadCloud />
                   </div>
@@ -184,7 +191,7 @@ export default function ImageUploader(props: any) {
             <Input
               {...getInputProps()}
               id="dropzone-file"
-              accept="image/png, image/jpeg"
+              accept="image/jpeg,image/png"
               type="file"
               className="hidden"
               disabled={loading || uploadedImagePath !== null}
