@@ -25,6 +25,7 @@ import RadialProgress from "./radial-progress";
 import { Upload, UploadCloud } from "lucide-react";
 import { Progress } from "./progress";
 import { useUserStore } from "@/lib/store";
+import { Timestamp } from "firebase/firestore";
 
 export default function ImageUploader(props: any) {
   const auth = useAuth();
@@ -85,7 +86,7 @@ export default function ImageUploader(props: any) {
     setLoading(true);
     const fileToUpload = image;
     const fileName = fileToUpload.name;
-    const storageRef = ref(storage, `images/${auth.currentUser.uid}/${fileName}`);
+    const storageRef = ref(storage, `images/${auth.currentUser.uid}/${fileName}-${Timestamp.now().toString()}`);
     
     //TODO upload image to firebase storage
     try {
