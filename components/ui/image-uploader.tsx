@@ -38,6 +38,8 @@ export default function ImageUploader(props: any) {
   );
   const userRole = useUserStore((state) => state.role);
 
+  const MAXIMUM_FILE_SIZE = 5000000;
+
   const onUploadProgress = (progressEvent: any) => {
     const percentage = Math.round(
       (progressEvent.bytesTransferred / progressEvent.totalBytes) * 100
@@ -52,7 +54,7 @@ export default function ImageUploader(props: any) {
 
       //check file size
       const fileSize = event.target.files[0].size;
-      if (fileSize > 400) {
+      if (fileSize > MAXIMUM_FILE_SIZE) {
         console.log('file size too large')
         return;
       }
@@ -110,7 +112,7 @@ export default function ImageUploader(props: any) {
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
-      if (acceptedFiles[0].size > 500000) {
+      if (acceptedFiles[0].size > MAXIMUM_FILE_SIZE) {
         console.log('file size too large')
         return;
       }
@@ -163,8 +165,8 @@ export default function ImageUploader(props: any) {
                 File supported.
               </p>
             )}
-            <label
-              htmlFor="dropzone-file"
+            <div
+              
               className="relative flex flex-col items-center justify-center w-full py-6 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
             >
               {loading && (
@@ -209,7 +211,7 @@ export default function ImageUploader(props: any) {
                   </p>
                 </div>
               )}
-            </label>
+            </div>
 
             <Input
               {...getInputProps()}
