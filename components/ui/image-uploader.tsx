@@ -47,7 +47,16 @@ export default function ImageUploader(props: any) {
   };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('file size', event.target.files?.[0])
     if (event.target.files?.length) {
+
+      //check file size
+      const fileSize = event.target.files[0].size;
+      if (fileSize > 400) {
+        console.log('file size too large')
+        return;
+      }
+
       // dispatch(setSelectedImage(event.target.files[0]));
       const selectedImage = event.target.files[0];
       setSelectedImage(selectedImage);
@@ -101,6 +110,10 @@ export default function ImageUploader(props: any) {
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
+      if (acceptedFiles[0].size > 500000) {
+        console.log('file size too large')
+        return;
+      }
       const selectedImage = acceptedFiles[0];
       setSelectedImage(selectedImage)
       handleImageUpload(selectedImage);
@@ -140,6 +153,16 @@ export default function ImageUploader(props: any) {
             {...getRootProps()}
             className=" flex items-center justify-center w-full"
           >
+            {isDragReject && (
+              <p className=" text-sm text-red-500">
+                File not supported (jpg, png, heic) or file is too large (max 5MB).
+              </p>
+            )}
+            {isDragAccept && (
+              <p className=" text-sm text-red-500">
+                File supported.
+              </p>
+            )}
             <label
               htmlFor="dropzone-file"
               className="relative flex flex-col items-center justify-center w-full py-6 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
@@ -191,7 +214,7 @@ export default function ImageUploader(props: any) {
             <Input
               {...getInputProps()}
               id="dropzone-file"
-              accept="image/jpeg,image/png"
+              accept="image/jpeg,image/png,image/heic"
               type="file"
               className="hidden"
               disabled={loading || uploadedImagePath !== null}
