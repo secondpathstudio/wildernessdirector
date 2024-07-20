@@ -91,7 +91,7 @@ export const FieldReportEditor: FC<FieldReportEditorProps> = (props) => {
   }
 
   return (
-    <Card className="col-span-3">
+    <Card className="col-span-3 order-1 md:order-2">
       <CardHeader>
         <CardTitle className="pb-2">Field Report Editor</CardTitle>
       </CardHeader>
