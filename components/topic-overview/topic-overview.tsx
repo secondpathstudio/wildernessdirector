@@ -14,6 +14,7 @@ import { BookOpen, FileQuestion, ListChecks } from "lucide-react";
 import { getMonth } from "@/lib/CONSTANTS";
 import ProgressCard from "./progress-card";
 import EventListItem from "./event-list-item";
+import { useUserStore } from "@/lib/store";
 
 interface TopicOverviewProps {
   topicId: string;
@@ -23,6 +24,7 @@ interface TopicOverviewProps {
 export const TopicOverview: FC<TopicOverviewProps> = (props) => {
   const auth = useAuth();
   const firestore = useFirestore();
+  const userRole = useUserStore((state) => state.role);
   const questionsCollection = collection(firestore, "questions");
   const questionsQuery = query(questionsCollection, 
     where('topicId', '==', props.topicId),
