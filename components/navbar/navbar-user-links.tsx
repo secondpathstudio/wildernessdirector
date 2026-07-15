@@ -9,11 +9,9 @@ import Link from "next/link";
 import { FC, useEffect } from "react";
 import { useUser } from "reactfire";
 import { useRouter, usePathname } from "next/navigation";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
 
 export const NavbarUserLinks: FC = () => {
   const { data, hasEmitted } = useUser();
-  const firestore = getFirestore();
   const userRole = useUserStore((state) => state.role);
   const setUserRole = useUserStore((state) => state.setRole);
   const router = useRouter();
@@ -21,14 +19,9 @@ export const NavbarUserLinks: FC = () => {
 
   useEffect(() => {
     if (hasEmitted && data) {
-        const userDoc = doc(firestore, "users", data.uid);
-        //check for user role
-        
-        getDoc(userDoc).then((doc) => {
-          if (doc.exists()) {
-            console.log("Setting user role", doc.data().role)
-            setUserRole(doc.data().role);
-          }
+        // role lives in the auth token's custom claims; no claim means 'free'
+        data.getIdTokenResult().then((result) => {
+          setUserRole(typeof result.claims.role === "string" ? result.claims.role : "free");
         });
 
         if (data.uid) {

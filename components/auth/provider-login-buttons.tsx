@@ -39,11 +39,11 @@ export const ProviderLoginButtons: FC<Props> = ({ onSignIn }) => {
           const userDoc = doc(firestore, `users/${user.uid}`);
           const userData = await getDoc(userDoc);
           if (userData.exists()) {
-            //user exists already
-            const dbRole = userData.data().role;
-          
-            console.log("Found user, setting role: ", dbRole)
-            setUserRole(dbRole);
+            //user exists already — role comes from the token's custom claims
+            const tokenResult = await user.getIdTokenResult();
+            setUserRole(
+              typeof tokenResult.claims.role === "string" ? tokenResult.claims.role : "free"
+            );
 
             return;
           }

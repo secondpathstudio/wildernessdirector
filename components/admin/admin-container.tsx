@@ -24,8 +24,6 @@ export const AdminContainer: FC = () => {
     idField: 'id',
   });
 
-//TODO ADD ADMIN AUTHENTICATION
-
   return (
     <>
       <div className="flex-col md:flex">
