@@ -1,0 +1,106 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Role comes from the custom claim set by /api/admin/set-role.
+    // Users with no claim (new sign-ups) are treated as 'free'.
+    function role() {
+      return signedIn() && 'role' in request.auth.token
+        ? request.auth.token.role
+        : '';
+    }
+
+    function isAdmin() {
+      return role() == 'admin';
+    }
+
+    function isFellow() {
+      return role() == 'admin' || role() == 'fellow';
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function onlyChanges(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
+    match /users/{uid} {
+      allow read: if isAdmin() || isSelf(uid);
+      // Sign-up creates the caller's own profile; role must start as 'free'.
+      allow create: if isSelf(uid)
+        && request.resource.data.get('role', 'free') == 'free';
+      // The role field is read-only from the client — it mirrors the custom
+      // claim and only changes via /api/admin/set-role (Admin SDK bypasses
+      // these rules). Admin clients may update other fields, e.g. the
+      // approvedQuestionCount counter written during question approval.
+      // curriculumGated (missing = gated) is admin-only: it controls whether
+      // the user's topics unlock sequentially, so users can't open their own.
+      allow update: if isAdmin()
+        ? !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])
+        : isSelf(uid)
+          && !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['role', 'curriculumGated']);
+      allow delete: if false;
+    }
+
+    match /topics/{topicId} {
+      allow read: if signedIn();
+      allow create, delete: if isAdmin();
+      // Fellows record progress by rewriting the embedded userProgress array,
+      // so that one field must stay writable. Tighten this to per-user
+      // progress docs when progress tracking is restructured.
+      allow update: if isAdmin()
+        || (isFellow() && onlyChanges(['userProgress']));
+
+      match /objectives/{objectiveId} {
+        allow read: if signedIn();
+        allow create, delete: if isAdmin();
+        allow update: if isAdmin()
+          || (isFellow() && onlyChanges(['completedBy', 'lastUpdated']));
+      }
+    }
+
+    match /questions/{questionId} {
+      // Fellows only ever query their own questions; admins review everything.
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.authorId == request.auth.uid);
+      allow create: if isFellow()
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.get('approved', false) == false;
+      // Authors may edit their own questions but cannot approve them or
+      // reassign authorship; approval is admin-only.
+      allow update: if isAdmin()
+        || (isFellow()
+          && resource.data.authorId == request.auth.uid
+          && request.resource.data.authorId == resource.data.authorId
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['approved']));
+      allow delete: if isAdmin()
+        || (isFellow() && resource.data.authorId == request.auth.uid);
+    }
+
+    match /fieldReports/{reportId} {
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.authorId == request.auth.uid);
+      allow create: if isFellow()
+        && request.resource.data.authorId == request.auth.uid;
+      allow update: if isAdmin()
+        || (isFellow()
+          && resource.data.authorId == request.auth.uid
+          && request.resource.data.authorId == resource.data.authorId);
+      allow delete: if isAdmin()
+        || (isFellow() && resource.data.authorId == request.auth.uid);
+    }
+
+    match /schedules/{scheduleId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isFellow();
+    }
+  }
+}

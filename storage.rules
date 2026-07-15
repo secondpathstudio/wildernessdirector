@@ -1,0 +1,21 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isFellow() {
+      return request.auth != null
+        && 'role' in request.auth.token
+        && (request.auth.token.role == 'admin' || request.auth.token.role == 'fellow');
+    }
+
+    // Uploads land at images/{uid}/{fileName} (see components/ui/image-uploader.tsx).
+    match /images/{uid}/{fileName} {
+      allow read: if request.auth != null;
+      allow create, update: if isFellow()
+        && request.auth.uid == uid
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if false;
+    }
+  }
+}
