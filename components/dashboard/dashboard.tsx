@@ -29,6 +29,8 @@ export const Dashboard: FC = () => {
   const { status: userStatus, data: userData } = useFirestoreDoc(userDoc, {
     idField: 'id'
   });
+  // Admin-controlled flag on the user doc; missing means gated.
+  const curriculumGated = userData?.data()?.curriculumGated !== false;
   
   useEffect(() => {
     //calculate current topic
@@ -79,7 +81,7 @@ export const Dashboard: FC = () => {
         <div className="flex">
           <div>
             {topics && topics.docs.map((topic,i) => {
-              var isLocked = topic.data().topicNumber > currentTopic;
+              var isLocked = curriculumGated && topic.data().topicNumber > currentTopic;
               var progress = 0;
               
               //check user progress on topic

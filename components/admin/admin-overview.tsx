@@ -1,5 +1,5 @@
 'use client';
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -9,10 +9,11 @@ import {
   LinkCard,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useAuth, useFirestore, useFirestoreCollectionData, useFirestoreDoc } from "reactfire";
+import { useAuth, useFirestore } from "reactfire";
+import { doc, updateDoc } from "firebase/firestore";
 import { AdminUserOverview } from "./admin-user-overview";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { doc, setDoc } from "firebase/firestore";
+import { Switch } from "../ui/switch";
 import { toast } from "../ui/use-toast";
 
 interface AdminOverviewProps {
@@ -22,9 +23,18 @@ interface AdminOverviewProps {
 
 export const AdminOverview: FC<AdminOverviewProps> = (props) => {
   const auth = useAuth();
-  const [userRole, setUserRole] = useState<string | undefined>(undefined);
   const firestore = useFirestore();
-  
+  const [userRole, setUserRole] = useState<string | undefined>(undefined);
+
+  const selectedUser = props.users?.find((user: any) => user.id === props.userId);
+  // Missing field means gated — the default for existing and new users.
+  const curriculumGated = selectedUser?.data()?.curriculumGated !== false;
+
+  // discard any unsaved role choice when a different user is selected
+  useEffect(() => {
+    setUserRole(undefined);
+  }, [props.userId]);
+
   const handleUserRoleChange = (newRole: string) => {
     if (auth.currentUser === null) {
       return;
@@ -38,11 +48,54 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
       return;
     }
 
-    const userRef = doc(firestore, `users/${props.userId}`);
     try {
-      await setDoc(userRef, { role: userRole }, { merge: true });
+      const idToken = await auth.currentUser.getIdToken();
+      const res = await fetch("/api/admin/set-role", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ uid: props.userId, role: userRole }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast({
+          title: "Failed to update role",
+          description: body.error ?? `Request failed (${res.status})`,
+        });
+        return;
+      }
+
+      toast({
+        title: "Role updated",
+        description: "Takes effect when the user next signs in or their session refreshes.",
+      });
     } catch (e) {
       console.error(e);
+      toast({ title: "Failed to update role", description: `${e}` });
+    }
+  }
+
+  const handleCurriculumGatingChange = async (gated: boolean) => {
+    if (props.userId === undefined || props.userId === "") {
+      return;
+    }
+
+    try {
+      await updateDoc(doc(firestore, `users/${props.userId}`), {
+        curriculumGated: gated,
+      });
+      toast({
+        title: gated ? "Curriculum gated" : "Curriculum opened",
+        description: gated
+          ? "Topics unlock in order as each one is completed."
+          : "All topics are unlocked for this user.",
+      });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Failed to update curriculum gating", description: `${e}` });
     }
   }
 
@@ -52,9 +105,7 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-7">
               <CardHeader>
-                <CardTitle>Overview for {props.users?.find((user: any) => user.id === props.userId)?.data()?.email}/ 
-                {props.users?.find((user: any) => user.id === props.userId)?.data()?.name} 
-              </CardTitle>
+                <CardTitle>Overview for {props.users?.find((user: any) => user.id === props.userId)?.data()?.name} ({props.users?.find((user: any) => user.id === props.userId)?.data()?.email})</CardTitle>
                 {props.userId !== undefined && (
                 <div className="flex items-center">
                   <Select 
@@ -73,6 +124,19 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
                     </SelectContent>
                     </Select>
                     {userRole !== undefined && <Button className="ml-4" onClick={saveUserRoleChange}>Save</Button>}
+                  </div>
+                )}
+                {selectedUser && (
+                  <div className="flex items-center gap-3 pt-2">
+                    <Switch
+                      checked={curriculumGated}
+                      onCheckedChange={handleCurriculumGatingChange}
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      {curriculumGated
+                        ? "Gated curriculum — topics unlock in order"
+                        : "Open curriculum — all topics unlocked"}
+                    </span>
                   </div>
                 )}
                 {props.users?.find((user: any) => user.id === props.userId) && (
