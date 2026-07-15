@@ -6,10 +6,9 @@ import {
   CardTitle,
   CardContent,
   CardDescription,
-  LinkCard,
 } from "@/components/ui/card";
-import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc, useFirestoreDocData } from "reactfire";
-import { Timestamp, collection, doc, orderBy, query, setDoc } from "firebase/firestore";
+import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc } from "reactfire";
+import { collection, orderBy, query } from "firebase/firestore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
@@ -17,6 +16,7 @@ import { useUserStore } from "@/lib/store";
 import { toast } from "../ui/use-toast";
 import { Axe, Book, Check } from "lucide-react";
 import CheckmarkButton from "../ui/checkmark-button";
+import { TopicProgress, getCompletion, progressDocRef, setObjectiveCompletion } from "@/lib/progress";
 
 interface TopicObjectivesProps {
   topicId: string;
@@ -25,13 +25,14 @@ interface TopicObjectivesProps {
 export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
   const auth = useAuth();
   const firestore = useFirestore();
-  const topicDoc = doc(firestore, "topics", props.topicId);
-  const { status, data: topicData } = useFirestoreDoc(topicDoc);
   const topicObjectivesCollection = collection(firestore, "topics", props.topicId, "objectives");
   const topicObjectivesQuery = query(topicObjectivesCollection,
     orderBy("reference", "asc"),
   );
   const { status: topicObjectivesStatus, data: topicObjectivesData } = useFirestoreCollection(topicObjectivesQuery);
+  const progressRef = progressDocRef(firestore, auth.currentUser?.uid ?? "anonymous", props.topicId);
+  const { data: progressSnap } = useFirestoreDoc(progressRef);
+  const progress = progressSnap?.data() as TopicProgress | undefined;
   const userRole = useUserStore((state) => state.role);
   const [showCompleted, setShowCompleted] = useState(true);
 
@@ -46,51 +47,18 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
       })
       return;
     }
-    
-    const objectiveDoc = doc(firestore, "topics", props.topicId, "objectives", objectiveId);
 
-    //update objective document
-    var completedByArray: object[] = [];
-    if (topicObjectivesData.docs.length > 0) {
-      completedByArray = topicObjectivesData.docs.find((objective: any) => objective.id === objectiveId)?.data().completedBy;
-      if (completedByArray.find((user: any) => user.userId === auth.currentUser?.uid) !== undefined){
-        return;
-      } else {
-        completedByArray.push({
-          userId: auth.currentUser?.uid,
-          userName: auth.currentUser?.displayName,
-          completedAt: Timestamp.now(),
-        });
-      }
+    if (getCompletion(progress, objectiveId) !== undefined) {
+      return;
     }
 
-    await setDoc(objectiveDoc, {
-      lastUpdated: Timestamp.now(),
-      completedBy: completedByArray,
-    }, { merge: true });
-
-    //TODO track user progress for main dashboard progress
-    var topicProgress = topicData?.data()?.userProgress;
-    if (topicProgress === undefined) {
-      topicProgress = [];
-    }
-    if (topicProgress.find((user: any) => user.userId === auth.currentUser?.uid) !== undefined){
-      //found user - update user progress by 1
-      topicProgress.find((user: any) => user.userId === auth.currentUser?.uid).completedObjectives += 1;
-      topicProgress.find((user: any) => user.userId === auth.currentUser?.uid).lastUpdated = Timestamp.now();
-    } else {
-      topicProgress.push({
-        userId: auth.currentUser?.uid,
-        userName: auth.currentUser?.displayName,
-        completedObjectives: 1,
-        lastUpdated: Timestamp.now(),
-      });
-    }
-
-    await setDoc(topicDoc, {
-      userProgress: topicProgress,
-    }, { merge: true });
-
+    await setObjectiveCompletion(firestore, {
+      userId: auth.currentUser.uid,
+      userName: auth.currentUser.displayName,
+      topicId: props.topicId,
+      objectiveId,
+      completed: true,
+    });
   }
 
   return (
@@ -128,8 +96,9 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                     )
                     :
                     topicObjectivesData.docs.map((objective: any) => {
-                      
-                      if (!showCompleted && objective.data().completedBy.find((user:any) => user.userId === auth.currentUser?.uid) !== undefined) {
+                      const completion = getCompletion(progress, objective.id);
+
+                      if (!showCompleted && completion !== undefined) {
                         return;
                       }
 
@@ -147,7 +116,7 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                         <TableCell>{objective.data().reference ? objective.data().reference : ""}</TableCell>
                         <TableCell>
                           {
-                            objective.data().completedBy.find((user:any) => user.userId === auth.currentUser?.uid) !== undefined ? (
+                            completion !== undefined ? (
                               <span className="text-primary"><Check size={25}/></span>
                             ) : (
                               <span></span>
@@ -168,22 +137,22 @@ export const TopicObjectives: FC<TopicObjectivesProps> = (props) => {
                           <DialogTitle className="text-sm">Objective Type</DialogTitle>
                           <DialogDescription>{objective.data().objectiveType}</DialogDescription>
                         </DialogHeader>
-                          
+
                         <DialogFooter>
-                        {(objective.data().objectiveType === "Reading" && objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid)) && (
+                        {(objective.data().objectiveType === "Reading" && completion) && (
                             <DialogDescription className="italic text-sm font-bold text-primary">
-                              Completed on {objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid).completedAt.toDate().toLocaleDateString()} ✅
+                              Completed on {completion.completedAt.toDate().toLocaleDateString()} ✅
                             </DialogDescription>
                         )}
-                        {(objective.data().objectiveType === "Reading" && !objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid)) && (
+                        {(objective.data().objectiveType === "Reading" && !completion) && (
                           <Button onClick={() => markObjectiveCompleted(objective.id)}>Mark as Completed</Button>
                         )}
-                        {objective.data().objectiveType === "Skills" && objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid) && (
+                        {objective.data().objectiveType === "Skills" && completion && (
                             <DialogDescription className="italic text-sm font-bold text-primary">
-                              Completed on {objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid).completedAt.toDate().toLocaleDateString()} ✅
+                              Completed on {completion.completedAt.toDate().toLocaleDateString()} ✅
                             </DialogDescription>
                         )}
-                        {objective.data().objectiveType === "Skills" && !objective.data().completedBy.find((user: any) => user.userId === auth.currentUser?.uid) && (
+                        {objective.data().objectiveType === "Skills" && !completion && (
                             <DialogDescription className="italic text-sm text-primary">
                               Requires sign off by fellowship director.
                             </DialogDescription>

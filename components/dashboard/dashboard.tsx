@@ -1,45 +1,66 @@
 'use client';
 
 import { FC, useEffect, useState } from "react";
-import { getDocs, collection, query, orderBy, doc, where } from "firebase/firestore";
+import { collection, query, orderBy, doc, where } from "firebase/firestore";
 import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc } from "reactfire";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
-  CardDescription,
-  LinkCard,
 } from "@/components/ui/card";
 import Link from "next/link";
 import { TopicButton } from "../ui/topic-button";
 import { Button } from "../ui/button";
+import { TopicProgress, completedObjectiveCount } from "@/lib/progress";
 
 export const Dashboard: FC = () => {
   const [currentTopic, setCurrentTopic] = useState(0);
   const firestore = useFirestore();
   const auth = useAuth();
+  const uid = auth.currentUser?.uid ?? "anonymous";
   const topicsCollection = collection(firestore, "topics");
   const [isAscending, setIsAscending] = useState(true);
   const topicsQuery = query(topicsCollection, orderBy('topicNumber', isAscending ? 'asc' : 'desc'));
   const { status, data: topics } = useFirestoreCollection(topicsQuery, {
     idField: 'id'
   });
-  const userDoc = doc(firestore, `users/${auth.currentUser?.uid}`)
+  const userDoc = doc(firestore, `users/${uid}`)
   const { status: userStatus, data: userData } = useFirestoreDoc(userDoc, {
     idField: 'id'
   });
   // Admin-controlled flag on the user doc; missing means gated.
   const curriculumGated = userData?.data()?.curriculumGated !== false;
-  
+
+  // One progress doc per topic, keyed by topicId, owned by this user.
+  const progressCollection = collection(firestore, `users/${uid}/progress`);
+  const { data: progressDocs } = useFirestoreCollection(progressCollection);
+  const completedByTopic = new Map<string, number>();
+  progressDocs?.docs.forEach((progressDoc) => {
+    completedByTopic.set(progressDoc.id, completedObjectiveCount(progressDoc.data() as TopicProgress));
+  });
+
+  const approvedQuestionsQuery = query(
+    collection(firestore, "questions"),
+    where('authorId', '==', uid),
+    where('approved', '==', true),
+  );
+  const { data: approvedQuestions } = useFirestoreCollection(approvedQuestionsQuery);
+  const approvedQuestionsByTopic = new Map<string, number>();
+  approvedQuestions?.docs.forEach((question) => {
+    const topicId = question.data().topicId;
+    approvedQuestionsByTopic.set(topicId, (approvedQuestionsByTopic.get(topicId) ?? 0) + 1);
+  });
+
   useEffect(() => {
     //calculate current topic
     var topicToSet = 0;
     if (status === 'success' && topics.docs.length > 0) {
       topics.docs.forEach((topic, i) => {
-        const userProgress = topic.data().userProgress?.find((user: any) => user.userId === auth.currentUser?.uid);
-        if (userProgress !== undefined) {
-          if (userProgress.completedObjectives / topic.data().objectiveCount >= 1) {
+        const completed = progressDocs?.docs
+          .find((progressDoc) => progressDoc.id === topic.id);
+        if (completed !== undefined) {
+          if (completedObjectiveCount(completed.data() as TopicProgress) / topic.data().objectiveCount >= 1) {
             topicToSet = i + 1;
           }
         }
@@ -47,9 +68,9 @@ export const Dashboard: FC = () => {
       setCurrentTopic(topicToSet);
       console.log('current topic', topicToSet);
     }
-  }, [topics]);
+  }, [topics, progressDocs]);
 
-  
+
 
   if (auth.currentUser === null || auth.currentUser === undefined) {
     return (
@@ -83,13 +104,13 @@ export const Dashboard: FC = () => {
             {topics && topics.docs.map((topic,i) => {
               var isLocked = curriculumGated && topic.data().topicNumber > currentTopic;
               var progress = 0;
-              
-              //check user progress on topic
-              const userProgress = topic.data().userProgress?.find((user: any) => user.userId === auth.currentUser?.uid);
-              if (userProgress !== undefined) {
-                progress = Math.round((userProgress.completedObjectives / topic.data().objectiveCount) * 100);
 
-                if (progress >= 100 && userProgress.approvedQuestions > 10) {
+              //check user progress on topic
+              const completed = completedByTopic.get(topic.id);
+              if (completed !== undefined) {
+                progress = Math.round((completed / topic.data().objectiveCount) * 100);
+
+                if (progress >= 100 && (approvedQuestionsByTopic.get(topic.id) ?? 0) > 10) {
                   isLocked = false;
                 }
               }
@@ -102,7 +123,7 @@ export const Dashboard: FC = () => {
                   id={topic.id}
                   index={i}
                   totalCount={11}
-                  locked={isLocked} 
+                  locked={isLocked}
                   current={currentTopic === i}
                   percentage={progress}
                 />

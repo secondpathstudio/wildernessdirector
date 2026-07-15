@@ -27,10 +27,6 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == uid;
     }
 
-    function onlyChanges(keys) {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
-    }
-
     match /users/{uid} {
       allow read: if isAdmin() || isSelf(uid);
       // Sign-up creates the caller's own profile; role must start as 'free'.
@@ -48,22 +44,30 @@ service cloud.firestore {
           && !request.resource.data.diff(resource.data).affectedKeys()
             .hasAny(['role', 'curriculumGated']);
       allow delete: if false;
+
+      // Per-fellow progress: one doc per topic, owned by the fellow.
+      // Admins also write here when signing off Skills objectives.
+      // userId/topicId must match the path so collectionGroup queries
+      // and admin views can trust the denormalized fields.
+      match /progress/{topicId} {
+        allow read: if isAdmin() || isSelf(uid);
+        allow create, update: if isAdmin()
+          || (isFellow() && isSelf(uid)
+            && request.resource.data.userId == uid
+            && request.resource.data.topicId == topicId);
+        allow delete: if isAdmin();
+      }
     }
 
     match /topics/{topicId} {
       allow read: if signedIn();
-      allow create, delete: if isAdmin();
-      // Fellows record progress by rewriting the embedded userProgress array,
-      // so that one field must stay writable. Tighten this to per-user
-      // progress docs when progress tracking is restructured.
-      allow update: if isAdmin()
-        || (isFellow() && onlyChanges(['userProgress']));
+      // Progress lives in users/{uid}/progress, so topic and objective docs
+      // are admin-authored content only.
+      allow create, update, delete: if isAdmin();
 
       match /objectives/{objectiveId} {
         allow read: if signedIn();
-        allow create, delete: if isAdmin();
-        allow update: if isAdmin()
-          || (isFellow() && onlyChanges(['completedBy', 'lastUpdated']));
+        allow create, update, delete: if isAdmin();
       }
     }
 

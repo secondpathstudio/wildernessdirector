@@ -3,9 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { BookOpen, FileQuestion, ListChecks } from 'lucide-react'
 
 type Props = {
-    topicData: any
-    auth: any
     titleText: string
+    completedObjectives?: number
     fieldReportStatus?: string
     fieldReports?: any
     questionStatus?: string
@@ -25,19 +24,12 @@ const ProgressCard = (props: Props) => {
         </CardHeader>
         {props.titleText === "Objectives Completed" && (
             <CardContent className="flex flex-col justify-center md:justify-start items-center md:items-start">
-                {props.topicData?.userProgress?.length > 0 ? (
-                    <div className="text-xl md:text-2xl font-bold flex items-center gap-1">
-                        <span className="md:hidden">
-                            <ListChecks />
-                        </span>
-                        {props.topicData.userProgress.find((u: any) => (u.userId === props.auth.currentUser?.uid))?.completedObjectives}
-                    </div>
-                ) :
-                    <div className="text-xl md:text-2xl font-bold flex items-center gap-1">
-                        <span className='md:hidden'><ListChecks /></span>
-                        0
-                    </div>
-                }
+                <div className="text-xl md:text-2xl font-bold flex items-center gap-1">
+                    <span className="md:hidden">
+                        <ListChecks />
+                    </span>
+                    {props.completedObjectives ?? 0}
+                </div>
             <div className="flex justify-center items-center md:hidden">
                 <CardTitle className="text-sm font-medium text-center">
                 {props.titleText}

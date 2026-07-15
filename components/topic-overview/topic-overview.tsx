@@ -8,10 +8,11 @@ import {
   CardDescription,
   LinkCard,
 } from "@/components/ui/card";
-import { useAuth, useFirestore, useFirestoreCollectionData, useFirestoreDocData } from "reactfire";
+import { useAuth, useFirestore, useFirestoreCollectionData, useFirestoreDoc, useFirestoreDocData } from "reactfire";
 import { collection, doc, query, where } from "firebase/firestore";
 import { BookOpen, FileQuestion, ListChecks } from "lucide-react";
 import { getMonth } from "@/lib/CONSTANTS";
+import { TopicProgress, completedObjectiveCount, progressDocRef } from "@/lib/progress";
 import ProgressCard from "./progress-card";
 import EventListItem from "./event-list-item";
 import { useUserStore } from "@/lib/store";
@@ -45,26 +46,25 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
     idField: 'id',
   });
 
+  const progressRef = progressDocRef(firestore, auth.currentUser?.uid ?? "anonymous", props.topicId);
+  const { data: progressSnap } = useFirestoreDoc(progressRef);
+  const progress = progressSnap?.data() as TopicProgress | undefined;
+
   return (
     <>
         <div className="flex-1 space-y-4 pt-6">
           <div className="grid gap-4 grid-cols-3">
-          <ProgressCard 
-            topicData={props.topicData} 
-            auth={auth} 
+          <ProgressCard
             titleText="Objectives Completed"
+            completedObjectives={completedObjectiveCount(progress)}
           />
-          <ProgressCard 
-            topicData={props.topicData} 
-            auth={auth} 
+          <ProgressCard
             titleText="Field Reports"
             fieldReportStatus={fieldReportStatus}
             fieldReports={fieldReports}
           />
-          <ProgressCard 
-            topicData={props.topicData} 
-            auth={auth} 
-            titleText="Questions Approved" 
+          <ProgressCard
+            titleText="Questions Approved"
             questionStatus={questionStatus}
             questions={questions}
           />

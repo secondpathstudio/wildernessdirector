@@ -38,7 +38,6 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
   const [isLoading, setIsLoading] = useState(false);
   const [newObjective, setNewObjective] = useState({
     objectiveText: "",
-    completedBy: [],
     reference: "",
     objectiveType: "",
     topicId: props.topicId,
@@ -98,7 +97,6 @@ export const AdminObjectiveCreator: FC<AdminObjectiveCreatorProps> = (props) => 
     setNewObjective({
         objectiveText: "",
         reference: "",
-        completedBy: [],
         objectiveType: "",
         topicId: props.topicId,
     });
