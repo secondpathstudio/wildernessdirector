@@ -7,13 +7,15 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import Link from "next/link";
 import { FC, useEffect } from "react";
-import { useUser } from "reactfire";
+import { useFirestore, useUser } from "reactfire";
 import { useRouter, usePathname } from "next/navigation";
+import { Timestamp, doc, setDoc } from "firebase/firestore";
 
 export const NavbarUserLinks: FC = () => {
   const { data, hasEmitted } = useUser();
   const userRole = useUserStore((state) => state.role);
   const setUserRole = useUserStore((state) => state.setRole);
+  const firestore = useFirestore();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -23,6 +25,12 @@ export const NavbarUserLinks: FC = () => {
         data.getIdTokenResult().then((result) => {
           setUserRole(typeof result.claims.role === "string" ? result.claims.role : "free");
         });
+
+        // last-seen stamp; sessions persist, so this fires on app load rather
+        // than only at explicit sign-in
+        setDoc(doc(firestore, `users/${data.uid}`), {
+          lastLogin: Timestamp.now(),
+        }, { merge: true }).catch((e) => console.error("lastLogin write failed", e));
 
         if (data.uid) {
           if (pathname?.includes("/login")) {

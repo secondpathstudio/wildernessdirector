@@ -203,7 +203,13 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
             <Card className="col-span-7">
               <CardHeader>
                 <CardTitle>Overview for {selectedUser.data()?.name || selectedUser.data()?.email}</CardTitle>
-                <CardDescription>{selectedUser.data()?.email}</CardDescription>
+                <CardDescription>
+                  {selectedUser.data()?.email}
+                  {" · "}
+                  {selectedUser.data()?.lastLogin
+                    ? `Last active ${selectedUser.data().lastLogin.toDate().toLocaleDateString()} at ${selectedUser.data().lastLogin.toDate().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+                    : "Never logged in"}
+                </CardDescription>
                 <div className="flex items-center">
                   <Select
                     onValueChange={(v) => handleUserRoleChange(v)}
