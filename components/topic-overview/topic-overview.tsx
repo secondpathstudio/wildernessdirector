@@ -14,6 +14,8 @@ import { BookOpen, FileQuestion, ListChecks } from "lucide-react";
 import { TopicProgress, completedObjectiveCount, progressDocRef } from "@/lib/progress";
 import ProgressCard from "./progress-card";
 import EventListItem from "./event-list-item";
+import { PracticeQuizCard } from "../quiz/practice-quiz-card";
+import { AssignedQuizzes } from "../quiz/assigned-quizzes";
 import { useUserStore } from "@/lib/store";
 
 interface TopicOverviewProps {
@@ -97,6 +99,10 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
               </CardHeader>
               <CardContent className="pl-2">{/* <Overview /> */}</CardContent>
             </Card>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+            <AssignedQuizzes topicId={props.topicId} />
+            <PracticeQuizCard topicId={props.topicId} topicName={props.topicData.topicName} />
           </div>
         </div>
     </>

@@ -59,6 +59,15 @@ service cloud.firestore {
             && request.resource.data.topicId == topicId);
         allow delete: if isAdmin();
       }
+
+      // Practice quiz results. Attempts are immutable once written.
+      match /quizAttempts/{attemptId} {
+        allow read: if isAdmin() || isSelf(uid);
+        allow create: if isFellow() && isSelf(uid)
+          && request.resource.data.userId == uid;
+        allow update: if false;
+        allow delete: if isAdmin();
+      }
     }
 
     match /topics/{topicId} {
@@ -73,10 +82,20 @@ service cloud.firestore {
       }
     }
 
+    // Admin-authored quizzes: curated sets of approved question ids,
+    // assigned to a topic. Fellows read them to take the quiz.
+    match /quizzes/{quizId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
     match /questions/{questionId} {
-      // Fellows only ever query their own questions; admins review everything.
+      // Authors see their own questions; admins review everything; fellows
+      // can read any approved question (the shared practice-quiz bank —
+      // queries must include where('approved', '==', true) to satisfy this).
       allow read: if isAdmin()
-        || (signedIn() && resource.data.authorId == request.auth.uid);
+        || (signedIn() && resource.data.authorId == request.auth.uid)
+        || (isFellow() && resource.data.approved == true);
       allow create: if isFellow()
         && request.resource.data.authorId == request.auth.uid
         && request.resource.data.get('approved', false) == false;

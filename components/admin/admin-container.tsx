@@ -1,6 +1,8 @@
 'use client';
 import { FC, useState } from "react";
-import { MainNav } from "@/components/topic-overview/main-nav";
+import { MainNav, NavTab } from "@/components/topic-overview/main-nav";
+import { AdminQuizzes } from "./admin-quizzes";
+import { BookOpen, ClipboardList, FileQuestion, ListChecks } from "lucide-react";
 import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc, useUser } from "reactfire";
 import { AdminOverview } from "./admin-overview";
 import { AdminFieldReports } from "./admin-field-reports";
@@ -13,9 +15,17 @@ import { UserPlus } from "lucide-react";
 import { Button } from "../ui/button";
 import AddUserForm from "./add-user-form";
 
+const ADMIN_TABS: NavTab[] = [
+  { label: "Overview", icon: null },
+  { label: "Objectives", icon: <ListChecks /> },
+  { label: "Field Reports", icon: <BookOpen /> },
+  { label: "Questions", icon: <FileQuestion /> },
+  { label: "Quizzes", icon: <ClipboardList /> },
+];
+
 export const AdminContainer: FC = () => {
     const user = useUser();
-  const [activePage, setActivePage] = useState(0); 
+  const [activePage, setActivePage] = useState(0);
   const [currentUserId, setCurrentUserId] = useState<string | undefined>("");
   const firestore = useFirestore();
   const usersCollection = collection(firestore, "users");
@@ -33,9 +43,10 @@ export const AdminContainer: FC = () => {
           </h2>
         </div>
         <div className="flex h-16 items-center bg-muted px-6 rounded-xl justify-between">
-          <MainNav 
+          <MainNav
             changeTab={setActivePage}
-            activePage={activePage} 
+            activePage={activePage}
+            tabs={ADMIN_TABS}
           />
           <div className="flex items-center gap-4">
             Current User: 
@@ -75,6 +86,7 @@ export const AdminContainer: FC = () => {
         {activePage === 1 && <AdminTopics />}
         {activePage === 2 && <AdminFieldReports />}
         {activePage === 3 && <AdminTopicQuestions userId={currentUserId} />}
+        {activePage === 4 && <AdminQuizzes />}
         
       </div>
     </>

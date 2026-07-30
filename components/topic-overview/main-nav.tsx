@@ -1,74 +1,57 @@
-import Link from "next/link";
-
 import { cn } from "@/lib/utils";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { BookOpen, FileQuestion, ListChecks } from "lucide-react";
+
+export interface NavTab {
+  label: string;
+  // shown on mobile; the first tab always shows its label
+  icon: ReactNode | null;
+}
+
+const DEFAULT_TABS: NavTab[] = [
+  { label: "Overview", icon: null },
+  { label: "Objectives", icon: <ListChecks /> },
+  { label: "Field Reports", icon: <BookOpen /> },
+  { label: "Questions", icon: <FileQuestion /> },
+];
 
 interface TopicNavProps {
   changeTab: (index: number) => void,
-  activePage: number
+  activePage: number,
+  tabs?: NavTab[],
 }
 
-export const MainNav: FC<TopicNavProps> = ({ changeTab, ...props }) => {
+export const MainNav: FC<TopicNavProps> = ({ changeTab, tabs, ...props }) => {
+  const navTabs = tabs ?? DEFAULT_TABS;
   return (
     <>
       <nav
         className={cn("hidden md:flex items-center space-x-4 lg:space-x-6")}
         {...props}
       >
-        <button
-          onClick={() => changeTab(0)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 0 && 'text-primary'}`}
-        >
-          Overview
-        </button>
-        <button
-          onClick={() => changeTab(1)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 1 && 'text-primary'}`}
-        >
-          Objectives
-        </button>
-        <button
-          onClick={() => changeTab(2)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 2 && 'text-primary'}`}
-        >
-          Field Reports
-        </button>
-        <button
-          onClick={() => changeTab(3)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 3 && 'text-primary'}`}
-        >
-          Questions
-        </button>
+        {navTabs.map((tab, i) => (
+          <button
+            key={tab.label}
+            onClick={() => changeTab(i)}
+            className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === i && 'text-primary'}`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </nav>
       <nav
         className={cn("flex md:hidden items-center w-full justify-between space-x-4 lg:space-x-6")}
         {...props}
       >
-        <button
-          onClick={() => changeTab(0)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 0 && 'text-primary'}`}
-        >
-          Overview
-        </button>
-        <button
-          onClick={() => changeTab(1)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 1 && 'text-primary'}`}
-        >
-          <ListChecks />
-        </button>
-        <button
-          onClick={() => changeTab(2)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 2 && 'text-primary'}`}
-        >
-          <BookOpen />
-        </button>
-        <button
-          onClick={() => changeTab(3)}
-          className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === 3 && 'text-primary'}`}
-        >
-          <FileQuestion />
-        </button>
+        {navTabs.map((tab, i) => (
+          <button
+            key={tab.label}
+            onClick={() => changeTab(i)}
+            className={`text-sm font-medium transition-colors hover:text-primary ${props.activePage === i && 'text-primary'}`}
+          >
+            {tab.icon ?? tab.label}
+          </button>
+        ))}
       </nav>
     </>
   );
