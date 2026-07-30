@@ -17,13 +17,23 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, doc, getDoc, query, where } from "firebase/firestore";
+import { useUserStore } from "@/lib/store";
 import { QuizRunner } from "./quiz-runner";
 
 interface AssignedQuizzesProps {
   topicId: string;
 }
 
+// Question fetches and attempt writes require the fellow/admin claim.
 export const AssignedQuizzes: FC<AssignedQuizzesProps> = (props) => {
+  const userRole = useUserStore((state) => state.role);
+  if (userRole !== 'fellow' && userRole !== 'admin') {
+    return null;
+  }
+  return <AssignedQuizList {...props} />;
+};
+
+const AssignedQuizList: FC<AssignedQuizzesProps> = (props) => {
   const auth = useAuth();
   const firestore = useFirestore();
 

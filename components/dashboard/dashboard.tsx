@@ -14,6 +14,7 @@ import { TopicButton } from "../ui/topic-button";
 import { Button } from "../ui/button";
 import { TopicProgress, completedObjectiveCount } from "@/lib/progress";
 import { sortTopicsByOrder } from "@/lib/topic-order";
+import { ReviewCard } from "../quiz/review-card";
 
 export const Dashboard: FC = () => {
   const [currentTopic, setCurrentTopic] = useState(0);
@@ -93,6 +94,8 @@ export const Dashboard: FC = () => {
             Fellowship Curriculum
           </h2>
         </div>
+
+        <ReviewCard />
 
         <div className="flex">
           <div>

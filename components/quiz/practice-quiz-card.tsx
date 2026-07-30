@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, query, where } from "firebase/firestore";
+import { useUserStore } from "@/lib/store";
 import { QuizRunner } from "./quiz-runner";
 
 interface PracticeQuizCardProps {
@@ -23,7 +24,16 @@ interface PracticeQuizCardProps {
   topicName: string;
 }
 
+// The shared bank query is only permitted for fellows/admins by the rules.
 export const PracticeQuizCard: FC<PracticeQuizCardProps> = (props) => {
+  const userRole = useUserStore((state) => state.role);
+  if (userRole !== 'fellow' && userRole !== 'admin') {
+    return null;
+  }
+  return <PracticeQuiz {...props} />;
+};
+
+const PracticeQuiz: FC<PracticeQuizCardProps> = (props) => {
   const auth = useAuth();
   const firestore = useFirestore();
   // The shared bank: approved questions from every author. The approved
