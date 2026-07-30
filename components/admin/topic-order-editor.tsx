@@ -11,6 +11,9 @@ import { sanitizeTopicOrder, sortTopicsByOrder } from "@/lib/topic-order";
 interface TopicOrderEditorProps {
   userId: string;
   savedTopicOrder: unknown;
+  // when provided, rows are clickable and the matching row is highlighted
+  selectedTopicId?: string | null;
+  onTopicSelect?: (topicId: string) => void;
 }
 
 export const TopicOrderEditor: FC<TopicOrderEditorProps> = (props) => {
@@ -103,13 +106,24 @@ export const TopicOrderEditor: FC<TopicOrderEditorProps> = (props) => {
           <Button size="sm" variant="outline" onClick={resetOrder}>Reset to default</Button>
         )}
       </div>
-      <div className="mt-2 divide-y rounded-md border max-w-md">
+      <div className="mt-2 divide-y rounded-md border">
         {orderedIds.map((topicId, i) => {
           const topic: any = topicById.get(topicId);
+          const isSelected = props.selectedTopicId === topicId;
           return (
-            <div key={topicId} className="flex items-center gap-2 px-3 py-1.5">
-              <span className="w-24 text-sm text-muted-foreground">{getMonth(i)}</span>
-              <span className="flex-1 text-sm">{topic?.topicName}</span>
+            <div
+              key={topicId}
+              className={`flex items-center gap-2 px-3 py-1.5 ${isSelected ? 'bg-muted' : ''}`}
+            >
+              <button
+                type="button"
+                className={`flex flex-1 items-center gap-2 text-left ${props.onTopicSelect ? 'cursor-pointer hover:text-primary' : ''}`}
+                onClick={() => props.onTopicSelect?.(topicId)}
+                disabled={!props.onTopicSelect}
+              >
+                <span className="w-24 text-sm text-muted-foreground">{getMonth(i)}</span>
+                <span className={`flex-1 text-sm ${isSelected ? 'font-semibold' : ''}`}>{topic?.topicName}</span>
+              </button>
               <Button
                 size="sm"
                 variant="ghost"

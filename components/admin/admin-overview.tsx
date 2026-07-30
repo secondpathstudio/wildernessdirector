@@ -11,11 +11,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth, useFirestore } from "reactfire";
 import { doc, updateDoc } from "firebase/firestore";
-import { AdminUserOverview } from "./admin-user-overview";
 import { TopicOrderEditor } from "./topic-order-editor";
+import { AdminTopicDetail } from "./admin-topic-detail";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Switch } from "../ui/switch";
 import { toast } from "../ui/use-toast";
+import { Users } from "lucide-react";
 
 interface AdminOverviewProps {
   userId: string | undefined;
@@ -26,14 +27,17 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
   const auth = useAuth();
   const firestore = useFirestore();
   const [userRole, setUserRole] = useState<string | undefined>(undefined);
+  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
 
   const selectedUser = props.users?.find((user: any) => user.id === props.userId);
   // Missing field means gated — the default for existing and new users.
   const curriculumGated = selectedUser?.data()?.curriculumGated !== false;
 
-  // discard any unsaved role choice when a different user is selected
+  // discard any unsaved role choice and topic selection when a different
+  // user is selected
   useEffect(() => {
     setUserRole(undefined);
+    setSelectedTopicId(null);
   }, [props.userId]);
 
   const handleUserRoleChange = (newRole: string) => {
@@ -100,18 +104,38 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
     }
   }
 
+  // friendly landing state until a fellow is chosen (including "All")
+  if (!selectedUser) {
+    return (
+      <div className="flex-1 space-y-4 pt-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          <Card className="col-span-7">
+            <CardContent className="flex flex-col items-center justify-center py-20 text-center">
+              <Users className="h-10 w-10 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold">Select a fellow to get started</h3>
+              <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+                Choose a user from the list in the top right to review their
+                progress, adjust their curriculum order, or manage their settings.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
         <div className="flex-1 space-y-4 pt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-7">
               <CardHeader>
-                <CardTitle>Overview for {props.users?.find((user: any) => user.id === props.userId)?.data()?.name} ({props.users?.find((user: any) => user.id === props.userId)?.data()?.email})</CardTitle>
-                {props.userId !== undefined && (
+                <CardTitle>Overview for {selectedUser.data()?.name || selectedUser.data()?.email}</CardTitle>
+                <CardDescription>{selectedUser.data()?.email}</CardDescription>
                 <div className="flex items-center">
-                  <Select 
+                  <Select
                     onValueChange={(v) => handleUserRoleChange(v)}
-                    value={userRole !== undefined ? userRole : props.users?.find((user: any) => user.id === props.userId)?.data()?.role}
+                    value={userRole !== undefined ? userRole : selectedUser.data()?.role ?? "free"}
                     >
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="User Role" />
@@ -126,41 +150,38 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
                     </Select>
                     {userRole !== undefined && <Button className="ml-4" onClick={saveUserRoleChange}>Save</Button>}
                   </div>
-                )}
-                {selectedUser && (
-                  <div className="flex items-center gap-3 pt-2">
-                    <Switch
-                      checked={curriculumGated}
-                      onCheckedChange={handleCurriculumGatingChange}
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      {curriculumGated
-                        ? "Gated curriculum — topics unlock in order"
-                        : "Open curriculum — all topics unlocked"}
-                    </span>
-                  </div>
-                )}
-                {selectedUser && (
-                  <TopicOrderEditor
-                    userId={selectedUser.id}
-                    savedTopicOrder={selectedUser.data()?.topicOrder}
+                <div className="flex items-center gap-3 pt-2">
+                  <Switch
+                    checked={curriculumGated}
+                    onCheckedChange={handleCurriculumGatingChange}
                   />
-                )}
-                {props.users?.find((user: any) => user.id === props.userId) && (
-                  <CardDescription>
-                    {props.users?.find((user: any) => user.id === props.userId)?.data()?.role ? 
-                    `Role: ${props.users?.find((user: any) => user.id === props.userId)?.data()?.role}` :
-                    "Role: free"
-                    }
-                  </CardDescription>
-                )}
+                  <span className="text-sm text-muted-foreground">
+                    {curriculumGated
+                      ? "Gated curriculum — topics unlock in order"
+                      : "Open curriculum — all topics unlocked"}
+                  </span>
+                </div>
               </CardHeader>
-              <CardContent className="pl-2">
-                {selectedUser ? (
-                    <AdminUserOverview userId={selectedUser.id} topicOrder={selectedUser.data()?.topicOrder}/>
-                ) :
-                <p>No user selected</p>
-                }
+              <CardContent>
+                <div className="grid gap-6 lg:grid-cols-7">
+                  <div className="lg:col-span-3">
+                    <TopicOrderEditor
+                      userId={selectedUser.id}
+                      savedTopicOrder={selectedUser.data()?.topicOrder}
+                      selectedTopicId={selectedTopicId}
+                      onTopicSelect={setSelectedTopicId}
+                    />
+                  </div>
+                  <div className="lg:col-span-4">
+                    {selectedTopicId ? (
+                      <AdminTopicDetail userId={selectedUser.id} topicId={selectedTopicId} />
+                    ) : (
+                      <p className="text-sm text-muted-foreground pt-8">
+                        Select a topic to review this fellow&apos;s progress.
+                      </p>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
