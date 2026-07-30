@@ -62,3 +62,15 @@ export const getAcademicMonthNumber = (int: number) => {
 
 // Approved questions a fellow must author per topic.
 export const REQUIRED_APPROVED_QUESTIONS = 11;
+
+// The academic year runs July–June. Returns the July calendar year of the
+// current academic year (e.g. 2026 covers July 2026 – June 2027), which is
+// also how users/{uid}.cohortYear is stored.
+export const getCurrentAcademicYear = () => {
+    const now = new Date();
+    return now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+}
+
+// 2026 -> "2026–27"
+export const formatCohort = (year: number) =>
+    `${year}–${String(year + 1).slice(-2)}`;

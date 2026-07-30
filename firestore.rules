@@ -40,11 +40,13 @@ service cloud.firestore {
       // the user's topics unlock sequentially, so users can't open their own.
       // topicOrder (missing = canonical order) is admin-only for the same
       // reason: it sets the fellow's curriculum sequence, which drives gating.
+      // cohortYear (the July year the fellow started) is admin-only: it
+      // drives the admin cohort filters.
       allow update: if isAdmin()
         ? !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])
         : isSelf(uid)
           && !request.resource.data.diff(resource.data).affectedKeys()
-            .hasAny(['role', 'curriculumGated', 'topicOrder']);
+            .hasAny(['role', 'curriculumGated', 'topicOrder', 'cohortYear']);
       allow delete: if false;
 
       // Per-fellow progress: one doc per topic, owned by the fellow.

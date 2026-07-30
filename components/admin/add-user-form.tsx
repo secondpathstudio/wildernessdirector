@@ -6,17 +6,20 @@ import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { toast } from '../ui/use-toast'
+import { formatCohort, getCurrentAcademicYear } from '@/lib/CONSTANTS'
 
 type Props = {}
 
 const AddUserForm = (props: Props) => {
     const auth = useAuth()
     const [isLoading, setIsLoading] = React.useState(false)
+    const currentYear = getCurrentAcademicYear()
     const [newUser, setNewUser] = React.useState({
         email: '',
         password: '',
         name: '',
         role: 'fellow',
+        cohortYear: currentYear,
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -43,7 +46,11 @@ const AddUserForm = (props: Props) => {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${idToken}`,
                 },
-                body: JSON.stringify(newUser),
+                body: JSON.stringify({
+                    ...newUser,
+                    // cohorts only apply to fellows
+                    cohortYear: newUser.role === 'fellow' ? newUser.cohortYear : undefined,
+                }),
             })
 
             if (!res.ok) {
@@ -59,7 +66,7 @@ const AddUserForm = (props: Props) => {
                 title: 'User created',
                 description: `${newUser.email} can sign in with the temporary password you set. Share it with them securely and have them change it.`,
             })
-            setNewUser({ email: '', password: '', name: '', role: 'fellow' })
+            setNewUser({ email: '', password: '', name: '', role: 'fellow', cohortYear: currentYear })
         } catch (err) {
             console.error(err)
             toast({ title: 'Failed to create user', description: `${err}` })
@@ -110,6 +117,26 @@ const AddUserForm = (props: Props) => {
                     </SelectGroup>
                 </SelectContent>
             </Select>
+
+            {newUser.role === 'fellow' && (
+                <Select
+                onValueChange={(v) => setNewUser({...newUser, cohortYear: Number(v)})}
+                value={String(newUser.cohortYear)}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Cohort" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            {[currentYear + 1, currentYear, currentYear - 1].map((year) => (
+                                <SelectItem key={year} value={String(year)}>
+                                    Cohort {formatCohort(year)}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            )}
 
             <Button type="submit">Create User</Button>
             </fieldset>

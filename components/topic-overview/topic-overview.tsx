@@ -12,6 +12,7 @@ import { useAuth, useFirestore, useFirestoreCollectionData, useFirestoreDoc, use
 import { collection, doc, query, where } from "firebase/firestore";
 import { BookOpen, FileQuestion, ListChecks } from "lucide-react";
 import { TopicProgress, completedObjectiveCount, progressDocRef } from "@/lib/progress";
+import { getCurrentAcademicYear } from "@/lib/CONSTANTS";
 import ProgressCard from "./progress-card";
 import EventListItem from "./event-list-item";
 import { PracticeQuizCard } from "../quiz/practice-quiz-card";
@@ -45,6 +46,15 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
   const scheduleDoc = doc(firestore, "schedules", props.topicId);
   const { status: schedulesStatus, data: schedule } = useFirestoreDocData(scheduleDoc, {
     idField: 'id',
+  });
+  // schedule docs accumulate events across fellowship years; only show the
+  // current academic year's (July 1 through June 30)
+  const academicYear = getCurrentAcademicYear();
+  const yearStart = new Date(academicYear, 6, 1);
+  const yearEnd = new Date(academicYear + 1, 6, 1);
+  const currentYearEvents = (schedule?.events ?? []).filter((event: any) => {
+    const start = event.startDate?.toDate?.();
+    return start && start >= yearStart && start < yearEnd;
   });
 
   const progressRef = progressDocRef(firestore, auth.currentUser?.uid ?? "anonymous", props.topicId);
@@ -83,7 +93,7 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
                 )}
                 {schedulesStatus === "success" && (
                   <CardContent>
-                    {schedule?.events?.length > 0 ? schedule.events.map((event: any, index: number) => {
+                    {currentYearEvents.length > 0 ? currentYearEvents.map((event: any, index: number) => {
                       return (
                         <EventListItem
                           event={event}

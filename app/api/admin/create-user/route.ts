@@ -19,9 +19,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Body must be JSON" }, { status: 400 });
   }
 
-  const { email, password, name = "", role = "fellow" } = body ?? {};
+  const { email, password, name = "", role = "fellow", cohortYear } = body ?? {};
   if (typeof email !== "string" || !/^\S+@\S+\.\S+$/.test(email)) {
     return NextResponse.json({ error: "A valid email is required" }, { status: 400 });
+  }
+  if (cohortYear !== undefined
+    && (typeof cohortYear !== "number" || cohortYear < 2000 || cohortYear > 2100)) {
+    return NextResponse.json({ error: "cohortYear must be a year" }, { status: 400 });
   }
   if (typeof password !== "string" || password.length < 8) {
     return NextResponse.json(
@@ -60,6 +64,7 @@ export async function POST(request: NextRequest) {
       email,
       name: typeof name === "string" ? name : "",
       role,
+      ...(cohortYear !== undefined ? { cohortYear } : {}),
       createdAt: Timestamp.now(),
     });
   } catch (err) {
