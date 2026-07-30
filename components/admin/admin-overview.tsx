@@ -17,8 +17,9 @@ import { AdminTopicDetail } from "./admin-topic-detail";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Switch } from "../ui/switch";
 import { toast } from "../ui/use-toast";
-import { Users } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Input } from "../ui/input";
+import { FellowsTable } from "./fellows-table";
 import {
   Dialog,
   DialogContent,
@@ -29,20 +30,20 @@ import {
 } from "../ui/dialog";
 
 interface AdminOverviewProps {
-  userId: string | undefined;
   users: any;
 }
 
 export const AdminOverview: FC<AdminOverviewProps> = (props) => {
   const auth = useAuth();
   const firestore = useFirestore();
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | undefined>(undefined);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const selectedUser = props.users?.find((user: any) => user.id === props.userId);
+  const selectedUser = props.users?.find((user: any) => user.id === selectedUserId);
   // Missing field means gated — the default for existing and new users.
   const curriculumGated = selectedUser?.data()?.curriculumGated !== false;
 
@@ -53,10 +54,10 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
     setSelectedTopicId(null);
     setDeleteOpen(false);
     setDeleteConfirmText("");
-  }, [props.userId]);
+  }, [selectedUserId]);
 
   const handleDeleteUser = async () => {
-    if (auth.currentUser === null || props.userId === undefined || props.userId === "") {
+    if (auth.currentUser === null || selectedUserId === null) {
       return;
     }
 
@@ -69,7 +70,7 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${idToken}`,
         },
-        body: JSON.stringify({ uid: props.userId }),
+        body: JSON.stringify({ uid: selectedUserId }),
       });
 
       if (!res.ok) {
@@ -86,6 +87,7 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
         description: "Their account, progress, and quiz attempts are removed. Authored questions and field reports remain.",
       });
       setDeleteOpen(false);
+      setSelectedUserId(null);
     } catch (e) {
       console.error(e);
       toast({ title: "Failed to delete user", description: `${e}` });
@@ -103,7 +105,7 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
   }
 
   const saveUserRoleChange = async () => {
-    if (auth.currentUser === null || props.userId === undefined || userRole === undefined) {
+    if (auth.currentUser === null || selectedUserId === null || userRole === undefined) {
       return;
     }
 
@@ -115,7 +117,7 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${idToken}`,
         },
-        body: JSON.stringify({ uid: props.userId, role: userRole }),
+        body: JSON.stringify({ uid: selectedUserId, role: userRole }),
       });
 
       if (!res.ok) {
@@ -138,12 +140,12 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
   }
 
   const handleCohortChange = async (value: string) => {
-    if (props.userId === undefined || props.userId === "") {
+    if (selectedUserId === null) {
       return;
     }
 
     try {
-      await updateDoc(doc(firestore, `users/${props.userId}`), {
+      await updateDoc(doc(firestore, `users/${selectedUserId}`), {
         cohortYear: value === "none" ? deleteField() : Number(value),
       });
       toast({
@@ -156,12 +158,12 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
   }
 
   const handleCurriculumGatingChange = async (gated: boolean) => {
-    if (props.userId === undefined || props.userId === "") {
+    if (selectedUserId === null) {
       return;
     }
 
     try {
-      await updateDoc(doc(firestore, `users/${props.userId}`), {
+      await updateDoc(doc(firestore, `users/${selectedUserId}`), {
         curriculumGated: gated,
       });
       toast({
@@ -176,24 +178,10 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
     }
   }
 
-  // friendly landing state until a fellow is chosen (including "All")
+  // the fellows table is the landing view; a row click drills into a user
+  // (also covers a selected user disappearing, e.g. after deletion)
   if (!selectedUser) {
-    return (
-      <div className="flex-1 space-y-4 pt-6">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card className="col-span-7">
-            <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-              <Users className="h-10 w-10 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold">Select a fellow to get started</h3>
-              <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-                Choose a user from the list in the top right to review their
-                progress, adjust their curriculum order, or manage their settings.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
+    return <FellowsTable users={props.users} onSelect={setSelectedUserId} />;
   }
 
   return (
@@ -202,6 +190,15 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-7">
               <CardHeader>
+                <div>
+                  <button
+                    type="button"
+                    className="flex items-center text-sm font-medium text-primary hover:underline mb-2"
+                    onClick={() => setSelectedUserId(null)}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-1" /> All fellows
+                  </button>
+                </div>
                 <CardTitle>Overview for {selectedUser.data()?.name || selectedUser.data()?.email}</CardTitle>
                 <CardDescription>
                   {selectedUser.data()?.email}
