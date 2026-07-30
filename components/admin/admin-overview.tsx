@@ -10,13 +10,23 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth, useFirestore } from "reactfire";
-import { doc, updateDoc } from "firebase/firestore";
+import { deleteField, doc, updateDoc } from "firebase/firestore";
+import { formatCohort, getCurrentAcademicYear } from "@/lib/CONSTANTS";
 import { TopicOrderEditor } from "./topic-order-editor";
 import { AdminTopicDetail } from "./admin-topic-detail";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Switch } from "../ui/switch";
 import { toast } from "../ui/use-toast";
 import { Users } from "lucide-react";
+import { Input } from "../ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 
 interface AdminOverviewProps {
   userId: string | undefined;
@@ -28,17 +38,61 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
   const firestore = useFirestore();
   const [userRole, setUserRole] = useState<string | undefined>(undefined);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const selectedUser = props.users?.find((user: any) => user.id === props.userId);
   // Missing field means gated — the default for existing and new users.
   const curriculumGated = selectedUser?.data()?.curriculumGated !== false;
 
-  // discard any unsaved role choice and topic selection when a different
-  // user is selected
+  // discard any unsaved role choice, topic selection, and delete confirmation
+  // when a different user is selected
   useEffect(() => {
     setUserRole(undefined);
     setSelectedTopicId(null);
+    setDeleteOpen(false);
+    setDeleteConfirmText("");
   }, [props.userId]);
+
+  const handleDeleteUser = async () => {
+    if (auth.currentUser === null || props.userId === undefined || props.userId === "") {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      const res = await fetch("/api/admin/delete-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ uid: props.userId }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast({
+          title: "Failed to delete user",
+          description: body.error ?? `Request failed (${res.status})`,
+        });
+        return;
+      }
+
+      toast({
+        title: "User deleted",
+        description: "Their account, progress, and quiz attempts are removed. Authored questions and field reports remain.",
+      });
+      setDeleteOpen(false);
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Failed to delete user", description: `${e}` });
+    } finally {
+      setIsDeleting(false);
+    }
+  }
 
   const handleUserRoleChange = (newRole: string) => {
     if (auth.currentUser === null) {
@@ -80,6 +134,24 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
     } catch (e) {
       console.error(e);
       toast({ title: "Failed to update role", description: `${e}` });
+    }
+  }
+
+  const handleCohortChange = async (value: string) => {
+    if (props.userId === undefined || props.userId === "") {
+      return;
+    }
+
+    try {
+      await updateDoc(doc(firestore, `users/${props.userId}`), {
+        cohortYear: value === "none" ? deleteField() : Number(value),
+      });
+      toast({
+        title: value === "none" ? "Cohort cleared" : `Cohort set to ${formatCohort(Number(value))}`,
+      });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Failed to update cohort", description: `${e}` });
     }
   }
 
@@ -161,6 +233,42 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
                       : "Open curriculum — all topics unlocked"}
                   </span>
                 </div>
+                <div className="flex items-center gap-3 pt-2">
+                  <Select
+                    onValueChange={handleCohortChange}
+                    value={selectedUser.data()?.cohortYear !== undefined
+                      ? String(selectedUser.data()?.cohortYear)
+                      : "none"}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Cohort" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="none">No cohort</SelectItem>
+                        {Array.from({ length: 8 }, (_, i) => getCurrentAcademicYear() + 1 - i).map((year) => (
+                          <SelectItem key={year} value={String(year)}>
+                            Cohort {formatCohort(year)}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <span className="text-sm text-muted-foreground">
+                    The July the fellow started — drives the admin cohort filter
+                  </span>
+                </div>
+                {auth.currentUser?.uid !== selectedUser.id && (
+                  <div className="pt-2">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => { setDeleteConfirmText(""); setDeleteOpen(true); }}
+                    >
+                      Delete User
+                    </Button>
+                  </div>
+                )}
               </CardHeader>
               <CardContent>
                 <div className="grid gap-6 lg:grid-cols-7">
@@ -186,6 +294,36 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
             </Card>
           </div>
         </div>
+
+        <Dialog open={deleteOpen} onOpenChange={(open) => { if (!open) { setDeleteOpen(false); setDeleteConfirmText(""); } }}>
+          <DialogContent className="sm:max-w-[425px] w-11/12 rounded-md">
+            <DialogHeader>
+              <DialogTitle>Delete {selectedUser.data()?.name || selectedUser.data()?.email}?</DialogTitle>
+              <DialogDescription>
+                This permanently deletes their login, progress, and quiz attempts.
+                Questions and field reports they authored are kept. This cannot be undone.
+              </DialogDescription>
+              <DialogDescription>
+                Type <span className="font-semibold">{selectedUser.data()?.email}</span> to confirm.
+              </DialogDescription>
+            </DialogHeader>
+            <Input
+              placeholder="Email"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+            />
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDeleteOpen(false)}>Cancel</Button>
+              <Button
+                variant="destructive"
+                disabled={isDeleting || deleteConfirmText.trim() !== selectedUser.data()?.email}
+                onClick={handleDeleteUser}
+              >
+                {isDeleting ? "Deleting..." : "Delete User"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
     </>
   );
 };
