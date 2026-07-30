@@ -59,3 +59,6 @@ export const getAcademicMonthNumber = (int: number) => {
         return 0;
     }
 }
+
+// Approved questions a fellow must author per topic.
+export const REQUIRED_APPROVED_QUESTIONS = 11;

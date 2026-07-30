@@ -1,7 +1,7 @@
 'use client';
 
 import { FC, useEffect, useState } from "react";
-import { collection, query, orderBy, doc, where } from "firebase/firestore";
+import { collection, query, orderBy, doc } from "firebase/firestore";
 import { useAuth, useFirestore, useFirestoreCollection, useFirestoreDoc } from "reactfire";
 import {
   Card,
@@ -42,18 +42,6 @@ export const Dashboard: FC = () => {
   const completedByTopic = new Map<string, number>();
   progressDocs?.docs.forEach((progressDoc) => {
     completedByTopic.set(progressDoc.id, completedObjectiveCount(progressDoc.data() as TopicProgress));
-  });
-
-  const approvedQuestionsQuery = query(
-    collection(firestore, "questions"),
-    where('authorId', '==', uid),
-    where('approved', '==', true),
-  );
-  const { data: approvedQuestions } = useFirestoreCollection(approvedQuestionsQuery);
-  const approvedQuestionsByTopic = new Map<string, number>();
-  approvedQuestions?.docs.forEach((question) => {
-    const topicId = question.data().topicId;
-    approvedQuestionsByTopic.set(topicId, (approvedQuestionsByTopic.get(topicId) ?? 0) + 1);
   });
 
   useEffect(() => {

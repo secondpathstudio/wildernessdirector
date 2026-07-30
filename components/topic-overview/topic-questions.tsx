@@ -4,14 +4,12 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardContent,
   CardDescription,
-  LinkCard,
+  CardContent,
 } from "@/components/ui/card";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -20,47 +18,56 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog"
 import { QuestionCreator } from "./question-creator";
+import { QuestionDetail, questionStatus, statusLabel } from "./question-detail";
+import { QuestionEditDialog } from "./question-edit-dialog";
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
-import { collection, deleteDoc, doc, orderBy, query, updateDoc, where } from "firebase/firestore";
-import { useUserStore } from "@/lib/store";
+import { collection, deleteDoc, doc, orderBy, query, where } from "firebase/firestore";
 import { Button } from "../ui/button";
+import { toast } from "../ui/use-toast";
+import { REQUIRED_APPROVED_QUESTIONS } from "@/lib/CONSTANTS";
 
-//create props to accept topicId string
 interface TopicQuestionsProps {
   topicId: string;
 }
 
-
 export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
   const auth = useAuth();
-  const userRole = useUserStore((state) => state.role);
   const firestore = useFirestore();
   const questionsCollection = collection(firestore, "questions");
-  const [isAscending, setIsAscending] = useState(false);
-  const questionsQuery = query(questionsCollection, 
-    orderBy('createdAt', isAscending ? 'asc' : 'desc'),
+  const questionsQuery = query(questionsCollection,
+    orderBy('createdAt', 'desc'),
     where('topicId', '==', props.topicId),
     where('authorId', '==', auth.currentUser?.uid));
   const { status, data: questions } = useFirestoreCollectionData(questionsQuery, {
     idField: 'id',
   });
 
-  const handleQuestionDelete = async (questionId: string) => {
-    try {
-      await deleteDoc(doc(questionsCollection, questionId));
-    } catch (error : any) {
-      console.error(error);
+  const [viewQuestion, setViewQuestion] = useState<any | null>(null);
+  const [editQuestion, setEditQuestion] = useState<any | null>(null);
+  const [deleteQuestion, setDeleteQuestion] = useState<any | null>(null);
+
+  const approvedCount = questions?.filter((question: any) => question.approved).length ?? 0;
+
+  const handleQuestionDelete = async () => {
+    if (deleteQuestion === null) {
+      return;
     }
+    try {
+      await deleteDoc(doc(questionsCollection, deleteQuestion.id));
+      toast({ title: "Question deleted" });
+    } catch (error: any) {
+      console.error(error);
+      toast({ title: "Failed to delete question", description: `${error}` });
+    }
+    setDeleteQuestion(null);
   }
 
-  //TODO how to make this responsive rather than fixed?
   const truncateQuestion = (questionText: string) => {
     return questionText.length > 50 ? questionText.substring(0, 50) + '...' : questionText;
   }
@@ -72,6 +79,11 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
             <Card className="col-span-4">
               <CardHeader>
                 <CardTitle>Questions</CardTitle>
+                {status === "success" && (
+                  <CardDescription>
+                    {approvedCount} / {REQUIRED_APPROVED_QUESTIONS} approved for this topic
+                  </CardDescription>
+                )}
               </CardHeader>
               <CardContent className="pl-2">
                 {status === "loading" && <p>Loading questions...</p>}
@@ -80,66 +92,48 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
                   <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Approved</TableHead>
-                      <TableHead className="">Date Added</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date Added</TableHead>
                       <TableHead>Question Text</TableHead>
                       <TableHead>Type</TableHead>
+                      <TableHead></TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {questions.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={3}>No questions found</TableCell>
+                        <TableCell colSpan={6}>No questions yet — use the creator to add your first one.</TableCell>
                       </TableRow>
                     )
                     :
                     questions.map((question: any) => (
-                      <Dialog key={question.id}>
-                        <TableRow>
-                          <TableCell>{question.approved ? "✅" : "🚫"}</TableCell>
-                          <TableCell>{question.createdAt.toDate().toLocaleDateString()}</TableCell>
-                          <TableCell>
-                            <DialogTrigger>
-                              {truncateQuestion(question.questionText)}
-                            </DialogTrigger>
-                          </TableCell>
-                          <TableCell>{question.questionType}</TableCell>
-                          <TableCell className={'cursor-pointer hover:bg-red-500'} onClick={() => handleQuestionDelete(question.id)}>Delete</TableCell>
-                        </TableRow>
-                        <DialogContent className=" sm:max-w-[425px] w-11/12 rounded-md">
-                          <DialogHeader>
-                            <DialogTitle>Question</DialogTitle>
-                            <DialogDescription>{question.questionText}</DialogDescription>
-                          </DialogHeader>
-                            {question.questionType === 'Multiple Choice' && (
-                              <DialogHeader>
-                                <DialogTitle>Answers</DialogTitle>
-                                <ul>
-                                  {question.answers.map((answerChoice: any, index: number) => (
-                                    <li key={index}>
-                                      <DialogDescription className={`${answerChoice.correct && 'font-bold text-primary'}`}>{answerChoice.text}</DialogDescription>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </DialogHeader>
-                            )}
-                            {question.questionType === 'True/False' && (
-                              <DialogHeader>
-                                <DialogTitle>Answer</DialogTitle>
-                                <DialogDescription>{question.answer.toString()}</DialogDescription>
-                              </DialogHeader>
-                            )}
-                          <DialogHeader>
-                            <DialogTitle>Explanation</DialogTitle>
-                            <DialogDescription>{question.explanation}</DialogDescription>
-                            <DialogTitle>Reference</DialogTitle>
-                            <DialogDescription>{question.reference}</DialogDescription>
-                          </DialogHeader>
-                          <DialogFooter>
-                            <DialogDescription className="italic text-sm opacity-30">Created on {question.createdAt.toDate().toLocaleDateString()}</DialogDescription>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
+                      <TableRow key={question.id}>
+                        <TableCell title={question.reviewComment ?? undefined}>
+                          {statusLabel[questionStatus(question)]}
+                        </TableCell>
+                        <TableCell>{question.createdAt.toDate().toLocaleDateString()}</TableCell>
+                        <TableCell
+                          className="cursor-pointer"
+                          onClick={() => setViewQuestion(question)}
+                        >
+                          {truncateQuestion(question.questionText)}
+                        </TableCell>
+                        <TableCell>{question.questionType}</TableCell>
+                        <TableCell>
+                          {/* approved questions are locked; ask an admin for fixes */}
+                          {!question.approved && (
+                            <Button variant="outline" size="sm" onClick={() => setEditQuestion(question)}>
+                              Edit
+                            </Button>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm" onClick={() => setDeleteQuestion(question)}>
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
                     ))}
                   </TableBody>
                 </Table>
@@ -149,6 +143,35 @@ export const TopicQuestions: FC<TopicQuestionsProps> = (props) => {
             <QuestionCreator topicId={props.topicId} />
           </div>
         </div>
+
+        <Dialog open={viewQuestion !== null} onOpenChange={(open) => !open && setViewQuestion(null)}>
+          <DialogContent className="sm:max-w-[425px] w-11/12 rounded-md max-h-[90vh] overflow-y-auto">
+            {viewQuestion && <QuestionDetail question={viewQuestion} />}
+          </DialogContent>
+        </Dialog>
+
+        <QuestionEditDialog
+          question={editQuestion}
+          onOpenChange={(open) => !open && setEditQuestion(null)}
+        />
+
+        <Dialog open={deleteQuestion !== null} onOpenChange={(open) => !open && setDeleteQuestion(null)}>
+          <DialogContent className="sm:max-w-[425px] w-11/12 rounded-md">
+            <DialogHeader>
+              <DialogTitle>Delete this question?</DialogTitle>
+              <DialogDescription>
+                {deleteQuestion && truncateQuestion(deleteQuestion.questionText)}
+              </DialogDescription>
+              <DialogDescription>
+                This cannot be undone{deleteQuestion?.approved ? ", and it will lower your approved count for this topic" : ""}.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDeleteQuestion(null)}>Cancel</Button>
+              <Button variant="destructive" onClick={handleQuestionDelete}>Delete</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
     </>
   );
 };
