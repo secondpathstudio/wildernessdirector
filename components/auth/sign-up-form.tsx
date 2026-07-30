@@ -17,11 +17,12 @@ import { FC, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useAuth, useFirestore } from "reactfire";
 import { Timestamp, doc, setDoc } from "firebase/firestore";
 
 const formSchema = z.object({
+  name: z.string().min(1, "Enter your name").max(100),
   email: z.string().email(),
   password: z.string().min(8).max(100),
 });
@@ -37,6 +38,7 @@ export const SignUpForm: FC<SignUpFormProps> = ({ onShowLogin, onSignUp }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
@@ -44,16 +46,19 @@ export const SignUpForm: FC<SignUpFormProps> = ({ onShowLogin, onSignUp }) => {
 
   const auth = useAuth();
 
-  const signup = async ({ email, password }: z.infer<typeof formSchema>) => {
+  const signup = async ({ name, email, password }: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
       const result = await createUserWithEmailAndPassword(auth, email, password);
       if (result?.user.uid && result.user.email) {
         try {
+          // email/password accounts have no displayName unless we set one;
+          // authored content (questions, reports) is attributed from it
+          await updateProfile(result.user, { displayName: name.trim() });
           await setDoc(doc(firestore, `users/${result.user.uid}`), {
             email: result.user.email,
             createdAt: Timestamp.now(),
-            name: result.user.displayName || "",
+            name: name.trim(),
             role: "free",
           });
         } catch (err) {
@@ -79,6 +84,19 @@ export const SignUpForm: FC<SignUpFormProps> = ({ onShowLogin, onSignUp }) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(signup)}>
           <fieldset disabled={isLoading} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input type="text" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"

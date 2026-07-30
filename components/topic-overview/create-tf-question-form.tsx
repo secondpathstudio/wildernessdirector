@@ -92,7 +92,7 @@ export const CreateTFQuestionForm: FC<QuestionFormProps> = (props) => {
           topicId: props.topicId ? props.topicId : "unknownTopicId",
           approved: false,
           authorId: auth.currentUser.uid,
-          authorName: auth.currentUser.displayName ? auth.currentUser.displayName : "unknown",
+          authorName: auth.currentUser.displayName || auth.currentUser.email || "unknown",
           createdAt: Timestamp.now(),
         });
         toast({

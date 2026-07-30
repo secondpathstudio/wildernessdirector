@@ -67,8 +67,8 @@ export const FieldReportEditor: FC<FieldReportEditorProps> = (props) => {
       await updateDoc(reportDoc, {
         ...fieldReport,
         authorId: auth.currentUser.uid,
-        authorName: auth.currentUser.displayName || "NoName",
-        createdAt: Timestamp.now(),
+        authorName: auth.currentUser.displayName || auth.currentUser.email || "unknown",
+        updatedAt: Timestamp.now(),
       });
       toast({
         title: "Report updated successfully!",
