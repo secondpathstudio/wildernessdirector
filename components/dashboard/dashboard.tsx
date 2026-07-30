@@ -13,6 +13,7 @@ import Link from "next/link";
 import { TopicButton } from "../ui/topic-button";
 import { Button } from "../ui/button";
 import { TopicProgress, completedObjectiveCount } from "@/lib/progress";
+import { sortTopicsByOrder } from "@/lib/topic-order";
 
 export const Dashboard: FC = () => {
   const [currentTopic, setCurrentTopic] = useState(0);
@@ -20,8 +21,8 @@ export const Dashboard: FC = () => {
   const auth = useAuth();
   const uid = auth.currentUser?.uid ?? "anonymous";
   const topicsCollection = collection(firestore, "topics");
-  const [isAscending, setIsAscending] = useState(true);
-  const topicsQuery = query(topicsCollection, orderBy('topicNumber', isAscending ? 'asc' : 'desc'));
+  // sortTopicsByOrder expects canonical topicNumber-asc input.
+  const topicsQuery = query(topicsCollection, orderBy('topicNumber', 'asc'));
   const { status, data: topics } = useFirestoreCollection(topicsQuery, {
     idField: 'id'
   });
@@ -31,6 +32,9 @@ export const Dashboard: FC = () => {
   });
   // Admin-controlled flag on the user doc; missing means gated.
   const curriculumGated = userData?.data()?.curriculumGated !== false;
+  // Admin-controlled per-fellow ordering; missing means canonical order.
+  const topicOrder = userData?.data()?.topicOrder;
+  const orderedTopics = topics ? sortTopicsByOrder(topics.docs, topicOrder) : [];
 
   // One progress doc per topic, keyed by topicId, owned by this user.
   const progressCollection = collection(firestore, `users/${uid}/progress`);
@@ -53,22 +57,25 @@ export const Dashboard: FC = () => {
   });
 
   useEffect(() => {
-    //calculate current topic
-    var topicToSet = 0;
+    // current topic = first topic in the fellow's order that isn't fully
+    // complete, so the pointer stays sane after a mid-year reorder
     if (status === 'success' && topics.docs.length > 0) {
-      topics.docs.forEach((topic, i) => {
-        const completed = progressDocs?.docs
-          .find((progressDoc) => progressDoc.id === topic.id);
-        if (completed !== undefined) {
-          if (completedObjectiveCount(completed.data() as TopicProgress) / topic.data().objectiveCount >= 1) {
-            topicToSet = i + 1;
-          }
+      const ordered = sortTopicsByOrder(topics.docs, userData?.data()?.topicOrder);
+      var topicToSet = ordered.length;
+      for (let i = 0; i < ordered.length; i++) {
+        const progressDoc = progressDocs?.docs
+          .find((progressDoc) => progressDoc.id === ordered[i].id);
+        const completed = progressDoc === undefined
+          ? 0
+          : completedObjectiveCount(progressDoc.data() as TopicProgress);
+        if (completed / ordered[i].data().objectiveCount < 1) {
+          topicToSet = i;
+          break;
         }
-      });
+      }
       setCurrentTopic(topicToSet);
-      console.log('current topic', topicToSet);
     }
-  }, [topics, progressDocs]);
+  }, [status, topics, progressDocs, userData]);
 
 
 
@@ -101,8 +108,8 @@ export const Dashboard: FC = () => {
 
         <div className="flex">
           <div>
-            {topics && topics.docs.map((topic,i) => {
-              var isLocked = curriculumGated && topic.data().topicNumber > currentTopic;
+            {orderedTopics.map((topic,i) => {
+              var isLocked = curriculumGated && i > currentTopic;
               var progress = 0;
 
               //check user progress on topic
@@ -110,7 +117,9 @@ export const Dashboard: FC = () => {
               if (completed !== undefined) {
                 progress = Math.round((completed / topic.data().objectiveCount) * 100);
 
-                if (progress >= 100 && (approvedQuestionsByTopic.get(topic.id) ?? 0) > 10) {
+                // completed work stays accessible even if a reorder moves it
+                // past the current topic
+                if (progress >= 100) {
                   isLocked = false;
                 }
               }
@@ -122,7 +131,7 @@ export const Dashboard: FC = () => {
                   key={topic.id}
                   id={topic.id}
                   index={i}
-                  totalCount={11}
+                  totalCount={orderedTopics.length - 1}
                   locked={isLocked}
                   current={currentTopic === i}
                   percentage={progress}

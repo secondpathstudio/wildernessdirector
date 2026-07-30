@@ -38,11 +38,13 @@ service cloud.firestore {
       // approvedQuestionCount counter written during question approval.
       // curriculumGated (missing = gated) is admin-only: it controls whether
       // the user's topics unlock sequentially, so users can't open their own.
+      // topicOrder (missing = canonical order) is admin-only for the same
+      // reason: it sets the fellow's curriculum sequence, which drives gating.
       allow update: if isAdmin()
         ? !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])
         : isSelf(uid)
           && !request.resource.data.diff(resource.data).affectedKeys()
-            .hasAny(['role', 'curriculumGated']);
+            .hasAny(['role', 'curriculumGated', 'topicOrder']);
       allow delete: if false;
 
       // Per-fellow progress: one doc per topic, owned by the fellow.

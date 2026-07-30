@@ -14,31 +14,29 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import ObjectiveTable from "./objective-table";
+import { getMonth } from "@/lib/CONSTANTS";
+import { sortTopicsByOrder } from "@/lib/topic-order";
 
 interface AdminUserOverviewProps {
     userId: string;
+    topicOrder?: unknown;
 }
 
 export const AdminUserOverview: FC<AdminUserOverviewProps> = (props) => {
   const auth = useAuth();
   const [currentTopic, setCurrentTopic] = useState<any>(null);
   const firestore = useFirestore();
-  const [isAscending, setIsAscending] = useState(true);
   const topicsCollection = collection(firestore, "topics");
-  const topicsQuery = query(topicsCollection, 
-    orderBy('topicNumber', isAscending ? 'asc' : 'desc'));
+  const topicsQuery = query(topicsCollection, orderBy('topicNumber', 'asc'));
   const { status, data: topics } = useFirestoreCollectionData(topicsQuery, {
     idField: 'id',
   });
+  // Show months in the selected fellow's order so admins see what the fellow sees.
+  const orderedTopics = topics ? sortTopicsByOrder(topics as { id: string }[], props.topicOrder) : [];
 
 
 
 
-
-  const getMonth = (month: number) => {
-    const months = ['July', 'August', 'September', 'October', 'November', 'December','January', 'February', 'March', 'April', 'May', 'June', ];
-    return months[month];
-  }
 
   return (
     <>
@@ -60,8 +58,8 @@ export const AdminUserOverview: FC<AdminUserOverviewProps> = (props) => {
                   </SelectTrigger>
                   <SelectContent>
                       <SelectGroup>
-                        {topics.map((topic: any) => (
-                          <SelectItem key={topic.id} value={topic.id}>{getMonth(topic.topicNumber)}</SelectItem>
+                        {orderedTopics.map((topic: any, i: number) => (
+                          <SelectItem key={topic.id} value={topic.id}>{getMonth(i)} — {topic.topicName}</SelectItem>
                         ))}
                       </SelectGroup>
                   </SelectContent>

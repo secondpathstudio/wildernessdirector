@@ -11,7 +11,6 @@ import {
 import { useAuth, useFirestore, useFirestoreCollectionData, useFirestoreDoc, useFirestoreDocData } from "reactfire";
 import { collection, doc, query, where } from "firebase/firestore";
 import { BookOpen, FileQuestion, ListChecks } from "lucide-react";
-import { getMonth } from "@/lib/CONSTANTS";
 import { TopicProgress, completedObjectiveCount, progressDocRef } from "@/lib/progress";
 import ProgressCard from "./progress-card";
 import EventListItem from "./event-list-item";
@@ -73,7 +72,7 @@ export const TopicOverview: FC<TopicOverviewProps> = (props) => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
             <Card className="lg:col-span-6 md:col-span-2 col-span-1">
               <CardHeader>
-                <CardTitle>{getMonth(props.topicData.topicNumber)} Events</CardTitle>
+                <CardTitle>Events</CardTitle>
                 {schedulesStatus === "loading" && (
                   <CardContent>Loading...</CardContent>
                 )}

@@ -2,8 +2,9 @@
 import { FC, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MainNav } from "@/components/topic-overview/main-nav";
-import { useFirestore, useFirestoreDoc } from "reactfire";
+import { useAuth, useFirestore, useFirestoreDoc } from "reactfire";
 import { doc } from "firebase/firestore";
+import { effectiveMonthIndex } from "@/lib/topic-order";
 import { TopicOverview } from "./topic-overview";
 import { QuestionCreator } from "./question-creator";
 import { TopicObjectives } from "./topic-objectives";
@@ -21,6 +22,11 @@ export const TopicContainer: FC = () => {
   const topicData = doc(firestore, "topics", topicId);
   const { status, data } = useFirestoreDoc(topicData);
 
+  // the fellow's own doc, for their custom topic order (if any)
+  const auth = useAuth();
+  const userDoc = doc(firestore, `users/${auth.currentUser?.uid ?? "anonymous"}`);
+  const { data: userData } = useFirestoreDoc(userDoc);
+
   if (status === "loading") {
     return <div>Loading...</div>;
   }
@@ -30,7 +36,7 @@ export const TopicContainer: FC = () => {
       <div className="flex-col md:flex">
         <div className="flex flex-col items-start justify-between space-y-2 mb-6">
           <h3>
-            {getMonth(data?.data()?.topicNumber)}
+            {getMonth(effectiveMonthIndex(topicId, data?.data()?.topicNumber, userData?.data()?.topicOrder))}
           </h3>
           <h2 className="text-xl md:text-3xl leading-5 font-bold tracking-tight">
           {data?.data()?.topicName || "Loading..."}

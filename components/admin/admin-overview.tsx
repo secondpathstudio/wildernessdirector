@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth, useFirestore } from "reactfire";
 import { doc, updateDoc } from "firebase/firestore";
 import { AdminUserOverview } from "./admin-user-overview";
+import { TopicOrderEditor } from "./topic-order-editor";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Switch } from "../ui/switch";
 import { toast } from "../ui/use-toast";
@@ -139,6 +140,12 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
                     </span>
                   </div>
                 )}
+                {selectedUser && (
+                  <TopicOrderEditor
+                    userId={selectedUser.id}
+                    savedTopicOrder={selectedUser.data()?.topicOrder}
+                  />
+                )}
                 {props.users?.find((user: any) => user.id === props.userId) && (
                   <CardDescription>
                     {props.users?.find((user: any) => user.id === props.userId)?.data()?.role ? 
@@ -149,9 +156,9 @@ export const AdminOverview: FC<AdminOverviewProps> = (props) => {
                 )}
               </CardHeader>
               <CardContent className="pl-2">
-                {props.users?.find((user: any) => user.id === props.userId) ? (
-                    <AdminUserOverview userId={props.users?.find((user: any) => user.id === props.userId).id}/>
-                ) : 
+                {selectedUser ? (
+                    <AdminUserOverview userId={selectedUser.id} topicOrder={selectedUser.data()?.topicOrder}/>
+                ) :
                 <p>No user selected</p>
                 }
               </CardContent>
