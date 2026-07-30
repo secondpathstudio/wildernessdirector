@@ -7,18 +7,12 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, doc, getDoc, query, where } from "firebase/firestore";
 import { useUserStore } from "@/lib/store";
-import { QuizRunner } from "./quiz-runner";
+import { QuizDialog } from "./quiz-dialog";
 
 interface AssignedQuizzesProps {
   topicId: string;
@@ -126,22 +120,15 @@ const AssignedQuizList: FC<AssignedQuizzesProps> = (props) => {
         );
       })}
 
-      <Dialog open={activeQuiz !== null} onOpenChange={(open) => !open && setActiveQuiz(null)}>
-        <DialogContent className="sm:max-w-[550px] w-11/12 rounded-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{activeQuiz?.title}</DialogTitle>
-          </DialogHeader>
-          {activeQuiz && (
-            <QuizRunner
-              key={session}
-              topicId={props.topicId}
-              quizId={activeQuiz.id}
-              questions={activeQuestions}
-              onClose={() => setActiveQuiz(null)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <QuizDialog
+        open={activeQuiz !== null}
+        title={activeQuiz?.title ?? "Quiz"}
+        topicId={props.topicId}
+        quizId={activeQuiz?.id}
+        questions={activeQuestions}
+        sessionKey={session}
+        onClose={() => setActiveQuiz(null)}
+      />
     </>
   );
 };

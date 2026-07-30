@@ -4,7 +4,7 @@ import { useAuth, useFirestore } from "reactfire";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface QuizRunnerProps {
   topicId: string;
@@ -12,12 +12,9 @@ interface QuizRunnerProps {
   questions: any[];
   // set when running an admin-created quiz; stamped onto the saved attempt
   quizId?: string;
+  // reports whether there are unsubmitted answers (for close confirmation)
+  onDirtyChange?: (dirty: boolean) => void;
   onClose: () => void;
-}
-
-interface QuizResponse {
-  questionId: string;
-  correct: boolean;
 }
 
 const shuffle = <T,>(items: T[]): T[] => {
@@ -41,35 +38,35 @@ export const QuizRunner: FC<QuizRunnerProps> = (props) => {
   const firestore = useFirestore();
   const [order] = useState<any[]>(() => shuffle(props.questions));
   const [index, setIndex] = useState(0);
-  const [selected, setSelected] = useState<number | boolean | null>(null);
-  const [responses, setResponses] = useState<QuizResponse[]>([]);
+  // one slot per question; null = not answered yet
+  const [answers, setAnswers] = useState<(number | boolean | null)[]>(
+    () => Array(props.questions.length).fill(null)
+  );
+  const [submitted, setSubmitted] = useState(false);
   const [saved, setSaved] = useState(false);
 
   const question = order[index];
-  const finished = index >= order.length;
-  const correctCount = responses.filter((response) => response.correct).length;
+  const answeredCount = answers.filter((answer) => answer !== null).length;
+  const allAnswered = answeredCount === order.length;
+  const correctCount = order.filter(
+    (q, i) => answers[i] !== null && isChoiceCorrect(q, answers[i]!)
+  ).length;
 
-  const handleAnswer = (choice: number | boolean) => {
-    if (selected !== null) {
-      return; // already answered — waiting on Next
+  const selectAnswer = (choice: number | boolean) => {
+    if (submitted) {
+      return;
     }
-    setSelected(choice);
-    setResponses([
-      ...responses,
-      { questionId: question.id, correct: isChoiceCorrect(question, choice) },
-    ]);
+    const next = [...answers];
+    next[index] = choice;
+    setAnswers(next);
+    props.onDirtyChange?.(true);
   };
 
-  const handleNext = async () => {
-    const nextIndex = index + 1;
-    setSelected(null);
-    setIndex(nextIndex);
-    if (nextIndex >= order.length) {
-      await saveAttempt();
-    }
-  };
+  const handleSubmit = async () => {
+    setSubmitted(true);
+    setIndex(0);
+    props.onDirtyChange?.(false);
 
-  const saveAttempt = async () => {
     const uid = auth.currentUser?.uid;
     if (uid === undefined || saved) {
       return;
@@ -80,8 +77,11 @@ export const QuizRunner: FC<QuizRunnerProps> = (props) => {
         topicId: props.topicId,
         ...(props.quizId ? { quizId: props.quizId } : {}),
         total: order.length,
-        correct: responses.filter((response) => response.correct).length,
-        responses,
+        correct: order.filter((q, i) => answers[i] !== null && isChoiceCorrect(q, answers[i]!)).length,
+        responses: order.map((q, i) => ({
+          questionId: q.id,
+          correct: answers[i] !== null && isChoiceCorrect(q, answers[i]!),
+        })),
         completedAt: Timestamp.now(),
       });
       setSaved(true);
@@ -91,92 +91,114 @@ export const QuizRunner: FC<QuizRunnerProps> = (props) => {
     }
   };
 
-  if (finished) {
-    return (
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">
-          Score: {correctCount} / {order.length}
-        </h3>
-        <ul className="space-y-1 max-h-60 overflow-y-auto">
-          {order.map((q, i) => (
-            <li key={q.id} className="flex items-start gap-2 text-sm">
-              {responses[i]?.correct
-                ? <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-green-600" />
-                : <XCircle className="h-4 w-4 mt-0.5 shrink-0 text-red-600" />}
-              <span>{q.questionText}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="flex gap-2">
-          <Button onClick={props.onClose}>Done</Button>
-        </div>
-      </div>
-    );
-  }
+  const pillClass = (i: number) => {
+    const base = "h-7 w-7 rounded-full text-xs font-medium border transition-colors";
+    const current = i === index ? " ring-2 ring-primary ring-offset-1" : "";
+    if (submitted) {
+      const correct = answers[i] !== null && isChoiceCorrect(order[i], answers[i]!);
+      return `${base}${current} ${correct
+        ? "border-green-600 bg-green-600/15 text-green-700"
+        : "border-red-600 bg-red-600/15 text-red-700"}`;
+    }
+    return `${base}${current} ${answers[i] !== null
+      ? "bg-primary text-background border-primary"
+      : "text-muted-foreground"}`;
+  };
 
-  const answered = selected !== null;
-  const wasCorrect = answered && isChoiceCorrect(question, selected!);
+  const selected = answers[index];
+
+  const choiceClass = (isThisChoice: boolean, isCorrectChoice: boolean) => {
+    if (submitted) {
+      if (isCorrectChoice) return "border-green-600 bg-green-600/10";
+      if (isThisChoice) return "border-red-600 bg-red-600/10";
+      return "opacity-60";
+    }
+    return isThisChoice
+      ? "border-primary bg-primary/10"
+      : "hover:bg-accent/10";
+  };
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Question {index + 1} of {order.length}
-      </p>
+      {/* navigator: arrows + per-question answered/result map */}
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={index === 0}
+          onClick={() => setIndex(index - 1)}
+          aria-label="Previous question"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <div className="flex flex-1 flex-wrap justify-center gap-1.5">
+          {order.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={pillClass(i)}
+              onClick={() => setIndex(i)}
+              aria-label={`Question ${i + 1}${answers[i] !== null ? " (answered)" : ""}`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={index === order.length - 1}
+          onClick={() => setIndex(index + 1)}
+          aria-label="Next question"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {submitted && (
+        <p className="text-center font-semibold">
+          Score: {correctCount} / {order.length}
+        </p>
+      )}
+
       <p className="font-medium">{question.questionText}</p>
 
       {question.questionType === 'Multiple Choice' && (
         <div className="space-y-2">
-          {question.answers.map((answer: any, i: number) => {
-            const highlight = answered
-              ? answer.correct
-                ? "border-green-600 bg-green-600/10"
-                : selected === i
-                  ? "border-red-600 bg-red-600/10"
-                  : "opacity-60"
-              : "hover:bg-accent/10";
-            return (
-              <button
-                key={i}
-                type="button"
-                className={`w-full text-left border rounded-md px-3 py-2 text-sm ${highlight}`}
-                onClick={() => handleAnswer(i)}
-              >
-                {answer.text}
-              </button>
-            );
-          })}
+          {question.answers.map((answer: any, i: number) => (
+            <button
+              key={i}
+              type="button"
+              className={`w-full text-left border rounded-md px-3 py-2 text-sm ${choiceClass(selected === i, answer.correct === true)}`}
+              onClick={() => selectAnswer(i)}
+            >
+              {answer.text}
+            </button>
+          ))}
         </div>
       )}
 
       {question.questionType === 'True/False' && (
         <div className="flex gap-2">
-          {[true, false].map((value) => {
-            const label = value ? "True" : "False";
-            const highlight = answered
-              ? question.answer === value
-                ? "border-green-600 bg-green-600/10"
-                : selected === value
-                  ? "border-red-600 bg-red-600/10"
-                  : "opacity-60"
-              : "hover:bg-accent/10";
-            return (
-              <button
-                key={label}
-                type="button"
-                className={`flex-1 border rounded-md px-3 py-2 text-sm ${highlight}`}
-                onClick={() => handleAnswer(value)}
-              >
-                {label}
-              </button>
-            );
-          })}
+          {[true, false].map((value) => (
+            <button
+              key={String(value)}
+              type="button"
+              className={`flex-1 border rounded-md px-3 py-2 text-sm ${choiceClass(selected === value, question.answer === value)}`}
+              onClick={() => selectAnswer(value)}
+            >
+              {value ? "True" : "False"}
+            </button>
+          ))}
         </div>
       )}
 
-      {answered && (
+      {submitted && (
         <div className="space-y-2 rounded-md border p-3">
           <p className="text-sm font-semibold">
-            {wasCorrect ? "Correct ✅" : "Incorrect ❌"}
+            {selected !== null && isChoiceCorrect(question, selected)
+              ? "Correct ✅"
+              : "Incorrect ❌"}
           </p>
           <p className="text-sm">{question.explanation}</p>
           {question.reference && (
@@ -185,10 +207,19 @@ export const QuizRunner: FC<QuizRunnerProps> = (props) => {
         </div>
       )}
 
-      <div className="flex justify-end">
-        <Button onClick={handleNext} disabled={!answered}>
-          {index + 1 >= order.length ? "Finish" : "Next"}
-        </Button>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {submitted
+            ? `Question ${index + 1} of ${order.length}`
+            : `${answeredCount} of ${order.length} answered`}
+        </p>
+        {submitted ? (
+          <Button onClick={props.onClose}>Done</Button>
+        ) : (
+          <Button onClick={handleSubmit} disabled={!allAnswered}>
+            Submit Quiz
+          </Button>
+        )}
       </div>
     </div>
   );

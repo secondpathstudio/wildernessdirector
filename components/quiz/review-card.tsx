@@ -7,18 +7,12 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, query, where } from "firebase/firestore";
 import { TopicProgress, completedObjectiveCount } from "@/lib/progress";
 import { useUserStore } from "@/lib/store";
-import { QuizRunner } from "./quiz-runner";
+import { QuizDialog } from "./quiz-dialog";
 
 const DECK_SIZE = 10;
 // attempts saved from review decks carry this sentinel instead of a topic id,
@@ -138,21 +132,14 @@ const ReviewDeck: FC = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={deckOpen} onOpenChange={setDeckOpen}>
-        <DialogContent className="sm:max-w-[550px] w-11/12 rounded-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Spaced Review</DialogTitle>
-          </DialogHeader>
-          {deckOpen && (
-            <QuizRunner
-              key={session}
-              topicId={REVIEW_TOPIC_SENTINEL}
-              questions={activeDeck}
-              onClose={() => setDeckOpen(false)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <QuizDialog
+        open={deckOpen}
+        title="Spaced Review"
+        topicId={REVIEW_TOPIC_SENTINEL}
+        questions={activeDeck}
+        sessionKey={session}
+        onClose={() => setDeckOpen(false)}
+      />
     </>
   );
 };

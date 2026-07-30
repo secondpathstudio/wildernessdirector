@@ -7,17 +7,11 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useAuth, useFirestore, useFirestoreCollectionData } from "reactfire";
 import { collection, query, where } from "firebase/firestore";
 import { useUserStore } from "@/lib/store";
-import { QuizRunner } from "./quiz-runner";
+import { QuizDialog } from "./quiz-dialog";
 
 interface PracticeQuizCardProps {
   topicId: string;
@@ -94,21 +88,14 @@ const PracticeQuiz: FC<PracticeQuizCardProps> = (props) => {
         </CardContent>
       </Card>
 
-      <Dialog open={quizOpen} onOpenChange={setQuizOpen}>
-        <DialogContent className="sm:max-w-[550px] w-11/12 rounded-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{props.topicName} Quiz</DialogTitle>
-          </DialogHeader>
-          {quizOpen && status === "success" && (
-            <QuizRunner
-              key={session}
-              topicId={props.topicId}
-              questions={bank}
-              onClose={() => setQuizOpen(false)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <QuizDialog
+        open={quizOpen && status === "success"}
+        title={`${props.topicName} Quiz`}
+        topicId={props.topicId}
+        questions={bank ?? []}
+        sessionKey={session}
+        onClose={() => setQuizOpen(false)}
+      />
     </>
   );
 };
